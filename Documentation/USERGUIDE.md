@@ -59,7 +59,7 @@ The following options are available:
 ### SCENE INPUT FILE FORMAT
 
 See 
-[MORAY-INPUT-FORMAT.md](http://github.com/oldwatchlover/Rendering-Plant/blob/master/Documentation/MORAY-INPUT-FORMAT.md) 
+[RP-INPUT-FORMAT.md](http://github.com/oldwatchlover/Rendering-Plant/blob/master/Documentation/RP-INPUT-FORMAT.md) 
 for a more detaled description of the input file format.
 
 Briefly, the input file format is a text file, with statements that look
