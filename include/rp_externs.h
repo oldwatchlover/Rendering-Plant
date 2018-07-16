@@ -123,7 +123,7 @@ extern Object_t 	*RPAddObject(int type);
 extern void		RPReadObjectFromFile(char *fname);
 extern void		RPFreeObject(Object_t *op);
 extern void		RPCleanupObjects(void);
-extern void     	RPProcessObjects(void);
+extern void     	RPProcessObjects(int doProject);
 extern void		RPDumpObject(Object_t *op);
 
 /* from sphere.c */
@@ -137,7 +137,7 @@ extern void		RPFreeInputPolygons(void);
 extern void     	RPAddTriangle(Tri_t *tri);
 extern void     	RPCloseTriangleList(int tcount);
 extern void     	RPProcessOneTriangle(Object_t *op, Tri_t *tri);
-extern void     	RPProcessAllTriangles(Object_t *op, int count, Tri_t *tris);
+extern void     	RPProcessAllTriangles(Object_t *op, int count, Tri_t *tris, int doProject);
 
 /* from vertex.c */
 extern void		RPInitInputVertices(void);

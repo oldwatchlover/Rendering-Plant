@@ -65,9 +65,7 @@ paint_scene(void)
     RPClearDepthFB(NULL);
     RPLoadBackgroundImage();
     RPSetSceneFlags(FLAG_PERSP_TEXTURE); /* tell pipeline to persp correct tex coords */
-    RPProcessObjects(); 		/* tranform objects to camera space */
-    paint_obj_process(); 		/* additional processing; project and clipcode, ... */
-    RPTransformLights(); 		/* transform lights to camera space */
+    RPProcessObjects(TRUE); 		/* tranform objects to camera space */
 
     if (Flagged(RPScene.flags, FLAG_FOG)) {
 	rgba_t	temp;

@@ -30,7 +30,7 @@ CFLAGS +=	-DPAINT -I../include/
 #
 # source code files: 
 #
-PAINT_CFILES =	paint.c geom.c rasterize.c shade.c
+PAINT_CFILES =	paint.c rasterize.c shade.c
 
 PAINT_OBJECTS =	$(PAINT_CFILES:.c=.o) 
 

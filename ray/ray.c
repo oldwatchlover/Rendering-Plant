@@ -74,10 +74,7 @@ raytrace_scene(void)
     fprintf(stderr,"\t[%d] lights...\n",RPScene.light_count);
 
 	/* tranform objects to camera space */
-    RPProcessObjects();
-
-	/* transform lights to camera space */
-    RPTransformLights();
+    RPProcessObjects(FALSE);
 
 	/* fov is actually fov/2.0 */
     tanfov = tanf(RPScene.camera->fovr/2.0);

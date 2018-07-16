@@ -8,10 +8,10 @@
 
 **_Rendering Plant_** is a framework to build 3D rendering software.
 
-The framework consists of two libraries: librp.a and libobj.a.
+The framework consists of two libraries: `librp.a` and `libobj.a`.
 
 The sample renderers are also compiled into libraries and there is
-main.c which links to the libraries to create the renderer executable.
+`main.c` which links to the libraries to create the renderer executable.
 
 This guide describes the usage of the sample renderers included with
 the **_Rendering Plant_** distribution:
@@ -22,6 +22,9 @@ the **_Rendering Plant_** distribution:
 
 The `input_file` is a text based scene description to render (the full input 
 language is described briefly below and ad nauseum in another document.
+
+Behavior and limitations of each sample renderer is documented in their respective
+directories.
 
 ### OPTIONS
 The following options are available:
@@ -73,9 +76,7 @@ production level 3D renderer (animation frame support, complex object
 formats, etc.).
 
 The naming and concepts (such as matrix naming/processing, coordinate space,
-and render state) are aligned pretty well with OpenGL (I've written
-a lot of OpenGL drivers in my professional career which influences my 3D
-graphics thinking and vocabulary). 
+and render state) are aligned pretty well with OpenGL.
 
 A (heavily commented) sample input file that uses many of the common features 
 looks like this:
@@ -237,6 +238,39 @@ The scene rendered by the sample input file above looks like this:
 <img src="../Images/simple.bmp"
      alt="Simple moray Scene Rendering"/>
      
+
+### BUILDING A RENDERER WITH **_RENDERING PLANT_**
+
+Required steps to build a renderer with **_Rendering Plant_**:
+
+- include `rp.h` in your renderer source code. In turn, that file will include
+`rp_defines.h`, `rp_types.h` and `rp_externs.h`. Become familiar with those
+files as they define the interface to the **_Rendering Plant_** framework.
+
+- link with `librp.a` and `libobj.a` libraries. Both are required; even if
+you are not using Wavefront `.obj` files, the scene parser needs that library
+to link successfully.
+
+- add a few lines of code in `main.c` or if you create your own `main()` function,
+follow these steps:
+
+    - set up yacc/lexx (bison/flex) properly, see `main.c` (certain variables are expected; the input should be piped through the C preprocessor, etc.).
+
+    - call `RPInit()` before doing anything else.
+
+    - call `RPInitInputVertices()`, `RPInitInputPolygons()` and `RPInitScene()` before parsing the input file.
+
+    - after parsing the input file, call your main scene render entry point.
+
+    - in your main scene render function, you should:
+
+        - clear the screen and zbuffer if desired.
+        - set any desired state.
+        - call `RPProcessObjects()`. After this, all objects will be in camera space, transformed with the camera at the origin looking down the -Z axis. If you pass `TRUE` to that function, the geometry will also be projected, generating clip codes and screen coordinates.
+        - you should then be able to use the `RPScene` and other data structures to create your rendered image.
+        - you can call `RPWriteColorFB()` to output the final image.
+
+See the sample code and `Makefile`'s for details.
 
 ### LIMITATIONS
 

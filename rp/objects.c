@@ -177,11 +177,16 @@ RPCleanupObjects(void)
 
 /* transform all the objects from model to world space */
 void
-RPProcessObjects(void)
+RPProcessObjects(int doProject)
 {
     Object_t	*op;
     Sphere_t	*sp;
     int         i;
+
+        /* transform lights */
+    RPTransformLights();
+
+        /* transform and process all objects in the scene */
 
     for (i=0; i<RPScene.obj_count; i++) {
 	op = RPScene.obj_list[i];
@@ -210,7 +215,7 @@ RPProcessObjects(void)
         	RPGenerateSphericalTexcoords(op);
     	    }
 
-  	    RPProcessAllTriangles(op, op->tri_count, op->tris);
+  	    RPProcessAllTriangles(op, op->tri_count, op->tris, doProject);
 
 		/* create after transform, to accelerate intersection testing: */
             op->sphere = create_bounding_sphere(op);

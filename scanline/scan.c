@@ -65,11 +65,7 @@ scan_scene(void)
     fprintf(stderr,"\t[%d] lights...\n",RPScene.light_count);
 
         /* tranform objects to camera space */
-    RPProcessObjects();
-    scan_obj_process();
-
-        /* transform lights to camera space */
-    RPTransformLights();
+    RPProcessObjects(TRUE);
 
     /* build edgepair structure */
 

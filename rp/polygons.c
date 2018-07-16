@@ -171,7 +171,7 @@ RPProcessOneTriangle(Object_t *op, Tri_t *tri)
 
 /* compute normal, diff vectors, and d for intersection/shading */
 void
-RPProcessAllTriangles(Object_t *op, int count, Tri_t *tp)
+RPProcessAllTriangles(Object_t *op, int count, Tri_t *tp, int doProject)
 {
     int		i;
 
@@ -193,6 +193,10 @@ RPProcessAllTriangles(Object_t *op, int count, Tri_t *tp)
     for (i=0; i<count; i++) {
 	tp[i].flags = 0x0;
 	RPProcessOneTriangle(op, &(tp[i]));
+    }
+
+    if (doProject) {
+	RPProjectAllVertices(op->vert_count, op->verts);
     }
 }
 

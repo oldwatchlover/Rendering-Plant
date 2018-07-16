@@ -20,7 +20,6 @@ y.output
 lex.yy.c
 lex.zz.c
 
-
 # Precompiled Headers
 *.gch
 *.pch
@@ -44,6 +43,11 @@ lex.zz.c
 *.i*86
 *.x86_64
 *.hex
+
+# RenderPlant Executables
+moray
+paint
+scan
 
 # Debug files
 *.dSYM/

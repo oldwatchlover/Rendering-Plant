@@ -30,7 +30,7 @@ CFLAGS +=	-DSCAN -I../include/ -I../ray/
 #
 # source code files: 
 #
-SCAN_CFILES =	edge.c geom.c raycast.c scan.c 
+SCAN_CFILES =	edge.c raycast.c scan.c 
 
 SCAN_OBJECTS =	$(SCAN_CFILES:.c=.o) 
 
