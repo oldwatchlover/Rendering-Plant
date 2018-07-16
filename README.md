@@ -12,8 +12,8 @@ and necessary stuff to write a 3D renderer. It includes:
 There are 3 renderers included with this package, allowing you to make pictures immediately or use
 them as examples to integrate your code into the framework.
 
-- moray : a basic ray-tracer
-- scan : a scanline rendering algorithm (much faster than the ray tracer with almost all of it's features)
-- paint : a GPU-style "painter's" algorithm, with z-buffer.
+- `moray` : a basic Whitted-stye ray tracer
+- `scan` : a scanline rendering algorithm (much faster than the ray tracer with almost all of it's features)
+- `paint` : a GPU-style "painter's" algorithm, with z-buffer.
 
 
