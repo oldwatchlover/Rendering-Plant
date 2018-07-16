@@ -13,6 +13,14 @@
 *.map
 *.exp
 
+# Yacc / Lex output
+y.tab.h
+y.tab.c
+y.output
+lex.yy.c
+lex.zz.c
+
+
 # Precompiled Headers
 *.gch
 *.pch
