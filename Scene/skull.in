@@ -1,0 +1,35 @@
+
+/*
+ * the Ohio State University skull
+ */
+
+#define XRES	1920
+#define YRES	1080
+
+sceneflags(ZBUFFER);
+
+output("skull.bmp", XRES, YRES);
+
+light(-300.0, 100.0, 600.0, 0.5, 0.5, 0.5);
+light(1000.0, 1000.0, 1000.0, 0.7, 0.7, 0.7);
+
+camera(-300.0, 100.0, 600.0,  0, 0, 0,  0, 1, 0,  20.0, XRES/YRES);
+
+objflags(CULL_BACK SMOOTHSHADE LIGHTING);
+
+identity(MTX_MODEL);
+translate(0.0, 0.0, -40.0);
+rotate(0.0, 0.0, 1.0, 0.0);
+scale(1.0, 1.0, 1.0);
+
+material(color, 1.0, 1.0, 0.0, 1.0);
+material(ambient, 0.2, 0.2, 0.2, 1.0);
+material(diffuse, 0.5, 0.5, 0.5, 1.0);
+material(specular, 1.0, 1.0, 1.0, 1.0);
+material(highlight, 1.0, 1.0, 1.0, 1.0);
+material(shiny, 180.0);
+
+loadobj("obj/skull_osu.obj");
+
+
+

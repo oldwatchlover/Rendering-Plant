@@ -1,0 +1,33 @@
+
+/*
+ * a simple cube
+ *
+ */
+
+#define XRES	1920
+#define YRES	1080
+
+output("cube.bmp", XRES, YRES);
+
+light(-1000.0, 1000.0, 1000.0, 1.0, 1.0, 1.0);
+##light(1000.0, 1000.0, 1000.0, 1.0, 1.0, 1.0);
+
+camera(300, 200, 500, 0, 0, 0, 0, 1, 0, 20.0, XRES/YRES);
+depthrange(100.0, 3000.0);
+
+objflags(CULL_BACK FLATSHADE LIGHTING);
+
+identity(MTX_MODEL);
+translate(0.0, 0.0, 0.0);
+rotate(0.0, 0.0, 1.0, 0.0);
+scale(100.0, 100.0, 100.0);
+
+material(color, 1.0, 1.0, 1.0, 1.0);
+material(ambient, 0.2, 0.2, 0.0, 1.0);
+material(diffuse, 0.7, 0.7, 0.0, 1.0);
+material(specular, 1.0, 1.0, 1.0, 1.0);
+material(shiny, 1.0);
+
+loadobj("obj/cube.obj");
+
+

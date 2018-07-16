@@ -1,0 +1,50 @@
+
+##
+## simple example of one triangle
+## 
+
+#define XRES	1280
+#define YRES	960
+
+clear(0.5294, 0.8078, 0.9216, 1.0);
+
+output("onetri.bmp", XRES, YRES);
+
+camera(0, 0, 500, 0, 0, 0, 0, 1, 0, 20.0, XRES/YRES);
+light(0.0, 0.0, -1000.0, 1.0, 1.0, 1.0);
+
+texture("Texture/checker.bmp", WRAP FILT MODULATE, 2.0, 3.0, 0.0, 0.0);
+
+## uncomment the following line to enable texture on the triangle: 
+objflags(TEXTURE);
+
+objflags(CULL_BACK VERTSHADE LIGHTING);	# TEXTURE requires LIGHTING
+
+material(ambient, 1.0, 1.0, 1.0, 1.0);	# must enable some material for lighting
+material(texname, "Texture/checker.bmp");
+
+identity(MTX_MODEL);
+translate(0.0, 0.0, 0.0);
+rotate(0.0, 0.0, 0.0, 1.0);
+rotate(0.0, 0.0, 1.0, 0.0);
+rotate(0.0, 1.0, 0.0, 0.0);
+scale(1.0, 1.0, 1.0);
+
+##
+## front facing triangles have counter-clockwise winding
+##
+
+vertex[3] {
+## |-model spc coord--||----- color ------||- tex coord -|
+## | x      y      z  || r    g    b    a ||  s    t     |
+  {-80.0, -60.0,   0.0, 1.0,   0,   0, 1.0,  0.0, 0.0},
+  { 80.0, -60.0,   0.0,   0, 1.0,   0, 1.0,  1.0, 0.0},
+  {  0.0,  60.0,   0.0,   0,   0, 1.0, 1.0,  0.5, 0.5},
+};
+
+trilist[2] {
+## index into vertex array describe triangle
+	{ 0, 1, 2 },
+};
+
+

@@ -1,0 +1,54 @@
+
+/*
+ * the infamous Utah teapot...
+ */
+
+#define XRES	1280
+#define YRES	960
+
+##renderflags(RENDER01);
+
+sceneflags(ZBUFFER);
+
+output("teapot.bmp", XRES, YRES);
+
+## uncomment this to show a background image loaded:
+##background("Texture/sky.bmp");
+
+light(-1000.0, 1000.0, 1000.0, 0.6, 0.6, 0.6);
+light(1000.0, 1000.0, 1000.0, 0.6, 0.6, 0.6);
+
+camera(15.0, 10.0, 30.0,  0, 0, 0,  0, 1, 0,  20.0, XRES/YRES);
+depthrange(10.0, 3000.0);
+## uncomment the following line to test hither/near clipping
+##depthrange(32.5, 3000.0);
+
+identity(MTX_MODEL);
+translate(0.0, -3.0, 0.0);
+rotate(0.0, 0.0, 1.0, 0.0);
+scale(2.0, 2.0, 2.0);
+
+##objflags(CULL_BACK FLATSHADE LIGHTING);
+objflags(CULL_BACK SMOOTHSHADE LIGHTING);
+
+## uncomment the next 4 lines to show spherical texture coordinate generation
+##objflags(TEXTURE);
+##objflags(TEXGEN_SPHERE);	# use sky.bmp 
+###texture("Texture/sky.bmp", WRAP FILT, 1.0, 1.0, 1.0, 0.0);
+##material(texname, "Texture/sky.bmp");
+
+## uncomment the next 4 lines to show cylinder texture coordinate generation
+##objflags(TEXTURE);
+##objflags(TEXGEN_CYLINDER);	# use checker.bmp
+##texture("Texture/checker.bmp", WRAP FILT, 8.0, 8.0, 0.0, 0.0);
+##material(texname, "Texture/checker.bmp");
+
+material(color, 1.0, 0.0, 0.0, 1.0);
+material(ambient, 0.2, 0.2, 0.2, 1.0);
+material(diffuse, 0.5, 0.5, 0.5, 1.0);
+material(specular, 1.0, 1.0, 1.0, 1.0);
+material(highlight, 1.0, 1.0, 1.0, 1.0);
+material(shiny, 120.0);
+
+loadobj("obj/teapot.obj");
+
