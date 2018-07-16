@@ -82,6 +82,7 @@ static int	pause = 0;
 static void 	init_input_memory(void);
 static void 	free_input_memory(void);
 
+
 /*
  * main routine.
  *
