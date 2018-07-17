@@ -197,6 +197,7 @@ Global Scene Commands
   * [clear](#clear)
   * [depthrange](#depthrange)
   * [fog](#fog)
+  * [genericflags](#genericflags)
   * [light](#light)
   * [output](#output)
   * [sceneflags](#sceneflags)
@@ -383,6 +384,67 @@ This specifies the fog parameters but it must be enabled with a call to
 
 ___
 
+### genericflags
+
+Set or clear generic scene state flags
+                                
+#### Specfication
+	
+        genericflags( flaglist );
+
+#### Parameters
+
+A flaglist is one or more render state flags.
+
+        Supported flags are:
+
+            RENDER01       first generic flag
+            RENDER02       second generic flag
+            RENDER03       third generic flag
+            RENDER04       fourth generic flag
+            RENDER05       fifth generic flag
+            RENDER06       sixth generic flag
+            RENDER07       seventh generic flag
+            RENDER08       eighth generic flag
+
+#### Description
+
+Enable/disable generic render state flags for the scene.
+
+A flag may be negated with the `~` or `!` operators. This is useful
+to "clear" a flag in the render state.
+
+The default state for all flags is off.
+
+These flags are passed through the input stream and the **_Rendering Plant_** 
+system, their status maintained in `RPScene.generic_flags`. Their purpose
+is to provide some renderer-defined behaviors via the input stream.
+
+If a renderer defines any of these flags, they should use the corresponding
+generic flag definition in `rp_defines.h` to test `RPScene.generic_flags` during
+execution.
+
+For example:
+
+`RENDER01` is interpreted by both `scan` and `paint` as "No Clipping". Setting
+this flag disables clipping in those renderers. This was added as a debugging
+feature, but could also be useful for acceleration (for example, in video games
+it is common to use a higher-order object visibiity method so that clipping
+is not necessary).
+
+`RENDER02` is interpreted by both `scan` and `paint` as "Outline Triangles".
+Setting this flag causes all triangles drawn to be outlined with a red line.
+This was added as a debugging feature.
+
+#### Notes
+
+These are "scene-wide" flags, affecting all objects in the scene. It might be
+useful to have a similar feature for object flags (not implemented).
+
+See the source code and the example scene `clip.in` for further information.
+
+___
+
 ### light
 
 Specify a local light in world coordinates
@@ -404,7 +466,6 @@ Creates a local light and adds it to the scene.
 
 This API currently only supports a simple local light (lights in all direction, no
 attenuation, etc.). Spot lights and other light sources should be added TBD.
-
 
 ___
 

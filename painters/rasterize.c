@@ -83,7 +83,6 @@ paint_tri(Object_t *op, Tri_t *tri)
  *
  * "H" is the high edge, the long edge of the triangle that goes from top to bottom y.
  * "M" is the upper edge on the side with a vertex between top and bottom y. (minor side)
- " "D" or "d" means "delta", incrementing across or down as we rasterize.
  * "L" is the lower edge on the side with a vertex between top and bottom y. (minor side)
  * "DxD*" are the deltas to walk across in the x direction for each scanline.
  * "DyD*" are the deltas to increment scanline to scanline (y direction) for each attribute)

@@ -66,6 +66,7 @@ paint_scene(void)
     RPLoadBackgroundImage();
     RPSetSceneFlags(FLAG_PERSP_TEXTURE); /* tell pipeline to persp correct tex coords */
     RPProcessObjects(TRUE); 		/* tranform objects to camera space */
+					/* TRUE flag also does projection */
 
     if (Flagged(RPScene.flags, FLAG_FOG)) {
 	rgba_t	temp;
@@ -91,7 +92,7 @@ paint_scene(void)
 	    for (j=0; j<op->tri_count; j++) {
                 tri = &(op->tris[j]);
 
-		/* we use this user-defined scene flat to turn off clipping: */
+		/* we use this user-defined scene flag to turn off clipping: */
 	        if (!Flagged(RPScene.generic_flags, FLAG_RENDER_01)) 
         	    retval = RPClipTriangle(op, tri);
 
