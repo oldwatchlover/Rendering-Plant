@@ -45,7 +45,6 @@
 #include <locale.h>
 #include <errno.h>
 #include <time.h>
-#include <sys/stat.h>
 
 #include "rp.h"
 
@@ -66,22 +65,6 @@
 #   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-p] [-v] [-y] scenefile"
 #endif
 
-/* for scene input file parser: */
-int	mylineno;
-char	line_buffer[MAX_FILENAME_LENGTH];
-char	input_file[MAX_FILENAME_LENGTH];
-
-/* variables from the parser: */
-extern FILE *yyin;
-extern int yydebug;
-extern int yyparse(void);
-
-/* local declarations for this file: */
-static int	debug = 0;
-static int	pause = 0;
-static void 	init_input_memory(void);
-static void 	free_input_memory(void);
-
 
 /*
  * main routine.
@@ -91,16 +74,14 @@ int
 main(int argc, char *argv[])
 {
     static rgba_t	sky_blue = {135, 206, 235, MAX_COLOR_VAL};
-    struct stat		statbuffer;
-    char		cppcmd[1024], cppdefs[512], usage_string[256], 
-			use_blue = FALSE;
+    char		cppdefs[512], usage_string[256];
     clock_t		begin, end;
     double		elapsed;
+    int			use_blue = FALSE, debug = FALSE, pause = FALSE, parsedebug = FALSE;
 
     setprogname(argv[0]);
     setlocale(LC_ALL,"");
     strcpy(cppdefs, "");
-    yydebug = 0;
     sprintf(usage_string,"usage : %s %s", argv[0], USAGE_STRING);
 
     RPInit(argv[0], 0x0);	/* must call this first */
@@ -143,7 +124,7 @@ main(int argc, char *argv[])
 	    break;
 
 	  case 'y':
-	    yydebug = TRUE;
+	    parsedebug = TRUE;
 	    break;
 	    
 	  default:
@@ -170,26 +151,12 @@ main(int argc, char *argv[])
 	c = fgetc(stdin);
     }
 
-    strcpy(input_file, argv[1]);
-
-    if (stat(input_file, &statbuffer) != 0) {
-	fprintf(stderr,"%s : ERROR : can't open input file [%s].\n",program_name,input_file);
-	exit(EXIT_FAILURE);
-    }
-
-    /* some environments prefer this... "/usr/bin/gcc -x c-header -E "... */
-    sprintf(cppcmd,"/usr/bin/cpp %s %s ", cppdefs, input_file);
-    
-    if ((yyin = (FILE *) popen(cppcmd, "r")) == NULL) {
-	fprintf(stderr,"ERROR : %s : could not process [%s] errno = %d\n",
-		__FILE__,input_file,errno);
-	exit(EXIT_FAILURE);
-    }
-
-    init_input_memory();
     RPInitScene();
+    RPInitInputVertices();
+    RPInitInputPolygons();
 
-	/* let command flags override scene flags for a few things: */
+	/* let command flags override default scene flags for a few things: */
+	/* (could still be changed by input file) */
     if (debug == 2)
 	RPSetSceneFlags(FLAG_VERBOSE2);
     else if (debug == 1)
@@ -210,15 +177,14 @@ main(int argc, char *argv[])
     RPEnableSphereSupport(FALSE);
 #endif
 
-    fprintf(stderr,"%s : parsing input file [%s]...\n",
-	    program_name,input_file);
-
-    if (yyparse())
+    if (!RPParseInputFile(argv[1], parsedebug, cppdefs)) {
+	fprintf(stderr,"%s : ERROR : could not parse input file [%s], exiting...\n",
+			program_name, argv[1]);
 	exit(EXIT_FAILURE);
-    
-    fclose(yyin);
+    }
 
-    free_input_memory();
+    RPFreeInputVertices();
+    RPFreeInputPolygons();
 
 	/* any other "beginning of time" renderer init goes here */
 
@@ -247,17 +213,4 @@ main(int argc, char *argv[])
     exit(EXIT_SUCCESS);
 }
 
-static void
-init_input_memory(void)
-{
-    RPInitInputVertices();
-    RPInitInputPolygons();
-}
-
-static void
-free_input_memory(void)
-{
-    RPFreeInputVertices();
-    RPFreeInputPolygons();
-}
 

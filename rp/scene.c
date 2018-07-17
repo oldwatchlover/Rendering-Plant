@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/stat.h>
 
 #include "rp.h"
 
@@ -67,6 +69,16 @@ static Viewport_t      default_viewport = {
 
        /* scissor box */
 static Scissor_t       default_scissor_box = { 0, 0, (MAX_XRES-1), (MAX_YRES-1) };
+
+/* for scene input file parser: */
+int     _RPmylineno;
+char    _RPline_buffer[MAX_FILENAME_LENGTH];
+char    _RPinput_file[MAX_FILENAME_LENGTH];
+
+/* variables from the parser: */
+extern FILE *yyin;
+extern int yydebug;
+extern int yyparse(void);
 
 /* initialize the RPScene.... should only be called once, at the begining of time,
  * or unpredictable things might occur...
@@ -166,3 +178,36 @@ RPClearGenericSceneFlags(u32 flags)
 }
 
 
+int
+RPParseInputFile(char *fname, int debugparse, char *cppdefs)
+{
+    struct stat         statbuffer;
+    char                cppcmd[1024];
+
+    strcpy(_RPinput_file, fname);
+
+    if (stat(_RPinput_file, &statbuffer) != 0) {
+        fprintf(stderr,"%s : ERROR : can't open input file [%s].\n",program_name,_RPinput_file);
+        return (FALSE);
+    }
+
+    /* some environments prefer this... "/usr/bin/gcc -x c-header -E "... */
+    sprintf(cppcmd,"/usr/bin/cpp %s %s ", cppdefs, _RPinput_file);
+
+    if ((yyin = (FILE *) popen(cppcmd, "r")) == NULL) {
+        fprintf(stderr,"%s : ERROR : could not process [%s] errno = %d\n",
+                program_name,_RPinput_file,errno);
+        return (FALSE);
+    }
+
+    yydebug = debugparse;
+
+    fprintf(stderr,"%s : parsing input file [%s]...\n", program_name,_RPinput_file);
+
+    if (yyparse())
+        return (FALSE);
+
+    fclose(yyin);
+
+    return (TRUE);
+}

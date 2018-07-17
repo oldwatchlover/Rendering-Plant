@@ -63,9 +63,9 @@ static int	facenlist[MAX_FACE_INDEX];
 static void	yyerror(char *s);
 
 /* from main.c */
-extern int mylineno;
-extern char line_buffer[];
-extern char input_file[];
+extern int obj_mylineno;
+extern char _RPObjline_buffer[];
+extern char _RPObjinput_file[];
 
 int 	yylex(void); /* added this to quiet warnings with bison -y */
 
@@ -476,8 +476,8 @@ static void
 yywarn(char *string)
 {
     fprintf(stderr,"WARNING: %s in file %s at line no. %d: [", 
-	    string, input_file, mylineno);
-    fprintf(stderr,"%s",line_buffer);
+	    string, _RPObjinput_file, obj_mylineno);
+    fprintf(stderr,"%s",_RPObjline_buffer);
     fprintf(stderr,"]\n");
 }
 #endif
@@ -486,8 +486,8 @@ static void
 yyerror(char *s)
 {
     fprintf(stderr,"ERROR: %s in file %s at line no. %d: [", 
-	    s, input_file, mylineno);
-    fprintf(stderr,"%s",line_buffer);
+	    s, _RPObjinput_file, obj_mylineno);
+    fprintf(stderr,"%s",_RPObjline_buffer);
     fprintf(stderr,"]\n");
 }
 

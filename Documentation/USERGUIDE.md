@@ -20,13 +20,16 @@ the **_Rendering Plant_** distribution:
         paint           a GPU style painter's algorithm.
         scan            a scanline renderer.
 
-The `input_file` is a text based scene description to render (the full input 
-language is described briefly below and ad nauseum in another document.
+The `input_file` is a text based scene description to render described
+briefly below (the full input language is detailed in another document).
 
 Behavior and limitations of each sample renderer is documented in their respective
 directories.
 
 ### OPTIONS
+These options are for the renderers distributed with **_Rendering Plant_** that
+link with `main.c`
+
 The following options are available:
 
     -D          Similar to -D for a compiler, this adds an implicit #define 
@@ -254,15 +257,13 @@ to link successfully.
 - add a few lines of code in `main.c` or if you create your own `main()` function,
 follow these steps:
 
-    - set up yacc/lexx (bison/flex) properly, see `main.c` (certain variables are expected; the input should be piped through the C preprocessor, etc.).
-
     - call `RPInit()` before doing anything else.
 
     - call `RPInitInputVertices()`, `RPInitInputPolygons()` and `RPInitScene()` before parsing the input file.
 
-    - after parsing the input file, call your main scene render entry point.
+    - call `RPParseInputFile()` 
 
-    - in your main scene render function, you should:
+    - call your main scene render entry point.  In your main scene render function, you should:
 
         - clear the screen and zbuffer if desired.
         - set any desired state.

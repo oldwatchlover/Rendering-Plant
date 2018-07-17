@@ -65,9 +65,9 @@ static void	expandstring(char *s);
 static void	yyerror(char *s);
 
 /* from main.c */
-extern int mylineno;
-extern char line_buffer[];
-extern char input_file[];
+extern int _RPmylineno;
+extern char _RPline_buffer[];
+extern char _RPinput_file[];
 
 int 	yylex(void); /* added this to quiet warnings with bison -y */
 
@@ -1485,8 +1485,8 @@ static void
 yywarn(char *string)
 {
     fprintf(stderr,"WARNING: %s in file %s at line no. %d: [", 
-	    string, input_file, mylineno);
-    fprintf(stderr,"%s",line_buffer);
+	    string, _RPinput_file, _RPmylineno);
+    fprintf(stderr,"%s",_RPline_buffer);
     fprintf(stderr,"]\n");
 }
 #endif
@@ -1495,8 +1495,8 @@ static void
 yyerror(char *s)
 {
     fprintf(stderr,"ERROR: %s in file %s at line no. %d: [", 
-	    s, input_file, mylineno);
-    fprintf(stderr,"%s",line_buffer);
+	    s, _RPinput_file, _RPmylineno);
+    fprintf(stderr,"%s",_RPline_buffer);
     fprintf(stderr,"]\n");
 }
 

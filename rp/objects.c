@@ -115,6 +115,10 @@ RPAddObject(int type)
     return (o);
 }
 
+/*
+ * incorporating 2 instances of yacc/lex is a little complicated...
+ *
+ */
 extern int	read_obj_from_file(char *filename, Object_t *op);
 
 /* called from the parser, reads a Wavefront obj geometry */

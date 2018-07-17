@@ -93,6 +93,7 @@ extern void     	RPSetViewport(float sx, float sy, float sz,
 					float tx, float ty, float tz);
 
 /* from scene.c */
+extern int		RPParseInputFile(char *fname, int debugparse, char *cppdefs);
 extern void		RPInitScene(void);
 extern void     	RPSetSceneFlags(u32 flags);
 extern void     	RPClearSceneFlags(u32 flags);

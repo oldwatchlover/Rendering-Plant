@@ -57,9 +57,9 @@
 #endif
 
 static void skippound(void);
-extern char line_buffer[];
-extern char input_file[];
-extern int  mylineno;
+extern char _RPObjline_buffer[];
+extern char _RPObjinput_file[];
+extern int  obj_mylineno;
 
 %}
 
@@ -70,62 +70,62 @@ extern int  mylineno;
 %}
 
 "v"                     {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = VERTEX;
 			    RET(VERTEX); 
                         }
 "vt"                    {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = VTEXCOORDS;
 			    RET(VTEXCOORDS); 
                         }
 "vn"                    {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = VNORMALS;
 			    RET(VNORMALS); 
                         }
 "vp"                    {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = VPARAMS;
 			    RET(VPARAMS); 
                         }
 "f"                     {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = FACE;
 			    RET(FACE); 
                         }
 "o"                     {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = OBJECT;
 			    RET(OBJECT); 
                         }
 "g"                     {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = GROUP;
 			    RET(GROUP); 
                         }
 "s"                     {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = SMOOTHGROUP;
 			    RET(SMOOTHGROUP); 
                         }
 "mtllib"                {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = MTLLIB;
 			    RET(MTLLIB); 
                         }
 "usemtl"                {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = USEMTL;
 			    RET(USEMTL); 
                         }
 "maplib"                {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = MAPLIB;
 			    RET(MAPLIB); 
                         }
 "usemap"                {
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = USEMAP;
 			    RET(USEMAP); 
                         }
@@ -134,49 +134,49 @@ extern int  mylineno;
 %}
 
 \n			{
-                            line_buffer[0] = '\0';
-                            mylineno++;
+                            _RPObjline_buffer[0] = '\0';
+                            obj_mylineno++;
 			}
 \r			{
-                            line_buffer[0] = '\0';
+                            _RPObjline_buffer[0] = '\0';
 			}
 "#"			{
 			    /* skip comments */
                             skippound();
 			}
 0x[0-9a-fA-F]+		{   /* hex integer */
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    sscanf(zztext, "%x", &zzlval.integer);
 			    RET(INTEGER);
 			}
 0X[0-9a-fA-F]+		{   /* hex integer */
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    sscanf(zztext, "%x", &zzlval.integer);
 			    RET(INTEGER);
 			}
 0[0-7]*		        {   /* octal integer */
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = strtol(zztext, NULL, 8);
 			    RET(INTEGER); 
 			}			
 [+-]?[1-9][0-9]*	{   /* decimal integer */
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.integer = atoi(zztext);
 			    RET(INTEGER); 
 			}			
 [-+]?[0-9]*\.[0-9]*     {   /* floating point */
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    zzlval.floater = atof(zztext);
 			    RET(FLOATER); 
 			}			
 [a-zA-Z0-9._/-]*         {   /* string */
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
                             zzlval.string = (char *) malloc(strlen(zztext));
                             strcpy(zzlval.string, zztext);
                             RET(STRING);
                         }
 [ \t]*			{
-                            strcat(line_buffer, zztext);
+                            strcat(_RPObjline_buffer, zztext);
 			    /* skip white space */
 			}			
 .			{
@@ -197,10 +197,10 @@ skippound(void)
     poundbuf[i] = '\0';
     if (sscanf(poundbuf, " %d \"%s\"",&lineno, fname) == 2) {
         fname[strlen(fname)-1] = '\0';
-        mylineno = lineno-1;
-        strcpy(input_file, fname);
+        obj_mylineno = lineno-1;
+        strcpy(_RPObjinput_file, fname);
     }
-    mylineno++;
+    obj_mylineno++;
 }
 
 

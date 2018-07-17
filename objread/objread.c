@@ -44,6 +44,8 @@
 
 /* for parser */
 int obj_mylineno;
+char _RPObjline_buffer[MAX_FILENAME_LENGTH];
+char _RPObjinput_file[MAX_FILENAME_LENGTH];
 
 /* from yacc: */
 extern int zzparse(void);
@@ -80,6 +82,8 @@ read_obj_from_file(char *filename, Object_t *op)
 		program_name,filename,errno);
 	return(FALSE);
     }
+
+    strcpy(_RPObjinput_file, filename);
 
     input_vertex_count = 0;
     input_normal_count = 0;

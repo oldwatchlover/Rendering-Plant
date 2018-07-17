@@ -226,7 +226,7 @@ shade_sphere_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 	    colorsum.b += (m->amb.b * pointcolor.b * light->color.b) + 
 			  (m->diff.b * NdotL * pointcolor.b * light->color.b) + 
 			  (m->spec.b * NdotH * m->highlight.b * light->color.b);
-	    colorsum.a += (m->amb.a * pointcolor.r * light->color.r) +
+	    colorsum.a += (m->amb.a * pointcolor.a * light->color.a) +
 			  (m->diff.a * NdotL * pointcolor.a * light->color.a) + 
 			  (m->spec.a * NdotH * m->highlight.a * light->color.a);
         }
