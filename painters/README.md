@@ -2,7 +2,11 @@
 
 This renderer is a hardware GPU algorithm simulator(1)...
 
-Per-poly rasterization with clipping and z-buffer.
+Per-poly rasterization with clipping and z-buffer. The "painter's" algorithm is one of the
+simplest visual surface algorithms (which is why it is favored for hardware implementations).
+The renderer simply loops through every polygon for every object in the scene and draws each to
+the frame buffer. A depth buffer (z-buffer) is used to determine which surface is closest to the eye
+and should be displayed for each pixel.
 
 Things it does NOT do:
 
@@ -15,6 +19,17 @@ Things it does NOT do:
     - non-polygonal geometry (however, if linked to librp.a, spheres can be
       approximated with polygonal data automatically for you).
 
+This renderer does not support `sphere()` input as implicit surfaces... it calls 
+`RPEnableSphereSupport(FALSE);` in main.c. Any sphere primitives in the scene will be automatically
+replaced with a polygonal representation of a sphere.
+
+This renderer rasterizes in screen space... therefore it forces `RPSetSceneFlags(FLAG_PERSP_TEXTURE)`
+for proper calculation of perspectively-corrected texture coordinates.
+
+This renderer implements and uses two of the generic scene state flags:
+
+    RENDER01        disable clipping (useful for debugging or performance optimization)
+    RENDER02        outline all triangles with a red border (useful for debugging)
 
 ----
 (1) What do you mean "algorithm simulator"?
