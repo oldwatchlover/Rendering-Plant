@@ -36,8 +36,9 @@
 #define __RP_TYPES_H__
 
 /* useful types: */
-typedef unsigned char   u8;
-typedef unsigned int    u32;
+typedef unsigned char   	u8;
+typedef unsigned short int   	u16;
+typedef unsigned int    	u32;
 
 /* common, useful 3D graphics types: */
 
@@ -75,8 +76,9 @@ typedef struct {
 } Vtx_t;
 
 typedef struct {
-    int		flags;	/* for back/front facing identity and clipping use */
     int         v0, v1, v2;	/* index into vertex array */
+    int 	flags;	/* for back/front facing identity and clipping use */
+    int		material_id;	/* future use */
     Colorf_t	color;		/* poly color, if desired */
                         /* precompute these for ray-tri intersection tests: */
     xyz_t       normal;	/* tri normal (normalized for shading) */
