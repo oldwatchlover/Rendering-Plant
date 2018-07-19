@@ -56,12 +56,6 @@
 #define MAX_YRES        	(1080*2)
 #define MAX_COLOR_VAL   	(255)
 
-/* some clipping flags: */
-#define FLAG_TRI_CLIPPED        0x10000000
-#define FLAG_TRI_CLIP_GEN       0x20000000
-#define CLIP_TRIVIAL_REJECT     (0)
-#define CLIP_TRIVIAL_ACCEPT     (1)
-
 /* useful math: */
 #define Pi                      ((float)(3.14159265f))
 #define DegToRad                (Pi/(float)180.0f)
@@ -112,9 +106,15 @@
 #define FLAG_SCENE_MULTISAMPLE	0x00000040
 #define FLAG_PERSP_TEXTURE	0x00000080
  
+/* some triangle flags (clipping): */
+#define FLAG_TRI_CLIPPED        0x0010
+#define FLAG_TRI_CLIP_GEN       0x0020
+#define CLIP_TRIVIAL_REJECT     (0)
+#define CLIP_TRIVIAL_ACCEPT     (1)
+
 /* per-object flags: */
-#define FLAG_CULL_BACK  	0x00000001
-#define FLAG_CULL_FRONT 	0x00000002
+#define FLAG_CULL_BACK  	0x00000001	/* also used for triangle flags */
+#define FLAG_CULL_FRONT 	0x00000002	/* also used for triangle flags */
 #define FLAG_TEXTURE    	0x00000004
 #define FLAG_LIGHTING   	0x00000008
 #define FLAG_FLATSHADE  	0x00000010	/* SMOOTHSHADE is !FLATSHADE */

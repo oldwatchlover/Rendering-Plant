@@ -77,8 +77,8 @@ typedef struct {
 
 typedef struct {
     int         v0, v1, v2;	/* index into vertex array */
-    int 	flags;	/* for back/front facing identity and clipping use */
-    int		material_id;	/* future use */
+    u16 	flags;		/* for back/front facing and clipping use */
+    short int	material_id;	/* future use, index into list of object materials */
     Colorf_t	color;		/* poly color, if desired */
                         /* precompute these for ray-tri intersection tests: */
     xyz_t       normal;	/* tri normal (normalized for shading) */
