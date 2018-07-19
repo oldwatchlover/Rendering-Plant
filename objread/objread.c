@@ -171,7 +171,7 @@ debug_printf(FILE *out, const char *fmt, ...)
 
     va_start(args, fmt);
 
-#ifdef DEBUG
+#ifdef DEBUG_LIBOBJ
     vfprintf(out, fmt, args);
 #endif
 

@@ -28,8 +28,8 @@ CC =    gcc
 
 CPPFLAGS =	
 
-CFLAGS =        -Ofast -Wall
-#CFLAGS =        -g -Wall
+#CFLAGS =        -Ofast -Wall
+CFLAGS =        -g -Wall -DDEBUG
 
 CFLAGS +=	-Wextra
 
@@ -39,6 +39,8 @@ CFLAGS +=	-Wextra
 #CFLAGS +=      -DDEBUG_MATRIX
 # more info while processing BMP files...
 #CFLAGS +=      -DDEBUG_BMP
+# more info while processing .obj files...
+#CFLAGS +=      -DDEBUG_LIBOBJ
 
 # generic rules to make .c file
 .c.o:
