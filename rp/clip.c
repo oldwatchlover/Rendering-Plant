@@ -395,34 +395,38 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
 
     /* all done, now output new triangles stored in temp1: */
 
+#ifdef DEBUG
     if ((n < 3) || (n > MAX_NEW_VERTS)) {
 	fprintf(stderr,"%s : ERROR : %s : CLIP : n = %d!\n",
 		program_name,__FILE__,n);
 	RPScene.trivial_rejected_polys++;
 	return (CLIP_TRIVIAL_REJECT);
     }
-
+#endif
 	/* extend op->verts and op->tris with realloc */
+    s = op->vert_count;
     op->verts = (Vtx_t *) realloc(op->verts, (op->vert_count+n) * sizeof(Vtx_t));
     bcopy(&(temp1[0]), &(op->verts[op->vert_count]), n*sizeof(Vtx_t));
+    op->vert_count += n;
 
+    new_tris = n - 2;
+    op->tris = (Tri_t *) realloc(op->tris, (op->tri_count+new_tris) * sizeof(Tri_t));
+
+#ifdef DEBUG
     if (Flagged(RPScene.flags, FLAG_VERBOSE2))
         fprintf(stderr,"clip : outputs %d vertices, %d triangles\n",
-		n, (n-2));
+		n, new_tris);
+#endif
     /* 
      * output new triangles
      * see how many points we ended up with and knit them
      * together as a triangle fan in the original order.
      */
-    s = op->vert_count;
-    new_tris = n - 2;
-    op->tris = (Tri_t *) realloc(op->tris, (op->tri_count+new_tris) * sizeof(Tri_t));
     tp = &(op->tris[op->tri_count]);
     for (i=2; i<n; i++) {
         add_clipped_tri(op, tri, tp, s+0, s+(i-1), s+i);
 	tp++;
     }
-    op->vert_count += n;
 
 	/* mark the original triangle as having been clipped */
     Flag(tri->flags, FLAG_TRI_CLIPPED);

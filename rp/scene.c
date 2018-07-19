@@ -187,7 +187,8 @@ RPParseInputFile(char *fname, int debugparse, char *cppdefs)
     strcpy(_RPinput_file, fname);
 
     if (stat(_RPinput_file, &statbuffer) != 0) {
-        fprintf(stderr,"%s : ERROR : can't open input file [%s].\n",program_name,_RPinput_file);
+        fprintf(stderr,"%s : ERROR : can't open input file [%s].\n",
+		program_name,_RPinput_file);
         return (FALSE);
     }
 
@@ -205,9 +206,11 @@ RPParseInputFile(char *fname, int debugparse, char *cppdefs)
     fprintf(stderr,"%s : parsing input file [%s]...\n", program_name,_RPinput_file);
 
     if (yyparse())
-        return (FALSE);
+        return (FALSE);	/* 0 return means end of file (success) */
 
     fclose(yyin);
 
     return (TRUE);
 }
+
+

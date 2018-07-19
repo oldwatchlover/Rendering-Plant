@@ -97,6 +97,7 @@ RPTransformAllVertices(Object_t *op, int count, Vtx_t *verts)
 	transpose_mtx(mvit, mvit);	/* compute transpose of MV^-1 */
     }
 
+#ifdef DEBUG
     if (Flagged(RPScene.flags, FLAG_VERBOSE2)) {
 	int	i;
 	fprintf(stderr,"TRANSFORMING object %d : %d POINTS BY MV MATRIX :\n",
@@ -124,6 +125,7 @@ RPTransformAllVertices(Object_t *op, int count, Vtx_t *verts)
 
 	fprintf(stderr,"POINTS AFTER TRANSFORM:\n");
     }
+#endif
 
     for (i=0; i<count; i++) {
 
@@ -180,10 +182,12 @@ RPTransformAllVertices(Object_t *op, int count, Vtx_t *verts)
 	verts[i].e.z = 0.0 - verts[i].pos.z;
 	vector_normalize(&(verts[i].e));
 
+#ifdef DEBUG
 	if (Flagged(RPScene.flags, FLAG_VERBOSE2)) {
 	    fprintf(stderr,"\t( %10.4f %10.4f %10.4f, %10.4f )\n", 
 		    verts[i].pos.x,verts[i].pos.y,verts[i].pos.z, verts[i].w);
 	}
+#endif
     }
 }
 
@@ -197,7 +201,7 @@ RPProjectAllVertices(int count, Vtx_t *vp)
     float	w;
     int 	j;
 
-
+#ifdef DEBUG
     if (Flagged(RPScene.flags, FLAG_VERBOSE2)) {
 	int	i;
 	fprintf(stderr,"PROJECTING %d POINTS BY P MATRIX :\n", count);
@@ -207,6 +211,7 @@ RPProjectAllVertices(int count, Vtx_t *vp)
 	}
 	fprintf(stderr,"POINTS AFTER PROJECTION:\n");
     }
+#endif
 
     for (j=0; j<count; j++) {
 
@@ -255,6 +260,7 @@ RPProjectAllVertices(int count, Vtx_t *vp)
         vp[j].sy = (int) (t.y * -RPScene.viewport->sy + RPScene.viewport->ty + 0.5);
         vp[j].sz = (int) (t.z *  RPScene.viewport->sz + RPScene.viewport->tz + 0.5);
 
+#ifdef DEBUG
         if (Flagged(RPScene.flags, FLAG_VERBOSE2)) {
             fprintf(stderr,"\teye points:\t%8.3f, %8.3f, %8.3f, %8.3f\n",
                 vp[j].pos.x, vp[j].pos.y, vp[j].pos.z, vp[j].w);
@@ -266,6 +272,7 @@ RPProjectAllVertices(int count, Vtx_t *vp)
                 vp[j].sx, vp[j].sy, vp[j].sz);
 	    fprintf(stderr,"\ttex coords: %f %f\n",vp[j].s,vp[j].t);
         }
+#endif
     } 
 }
 

@@ -51,18 +51,18 @@
 #ifdef MORAY
 #   include "ray.h"
 #   define PROGRAM_VERSION	"2.0"
-#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-m samples] [-p] [-v] [-y] scenefile"
+#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-m samples] [-v] [-y] scenefile"
     static int		use_multisample = 0;
 #endif
 #ifdef SCAN
 #   include "scan.h"
-#   define PROGRAM_VERSION	"0.6"
-#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-m samples] [-p] [-v] [-y] scenefile"
+#   define PROGRAM_VERSION	"0.8"
+#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-v] [-y] scenefile"
 #endif
 #ifdef PAINT
 #   include "paint.h"
 #   define PROGRAM_VERSION	"1.0"
-#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-p] [-v] [-y] scenefile"
+#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-v] [-y] scenefile"
 #endif
 
 
@@ -77,7 +77,7 @@ main(int argc, char *argv[])
     char		cppdefs[512], usage_string[256];
     clock_t		begin, end;
     double		elapsed;
-    int			use_blue = FALSE, debug = FALSE, pause = FALSE, parsedebug = FALSE;
+    int			use_blue = FALSE, debug = FALSE, parsedebug = FALSE;
 
     setprogname(argv[0]);
     setlocale(LC_ALL,"");
@@ -114,10 +114,7 @@ main(int argc, char *argv[])
 	    argv++;
 	    break;
 #endif
-	  case 'p':
-	    pause = TRUE;
-	    break;
-	    
+
 	  case 'v':
 	    if (debug == 0)
 	        debug++;
@@ -146,17 +143,12 @@ main(int argc, char *argv[])
     fprintf(stderr,"%s : Version %s, compiled %s against Rendering Plant version %s\n",
 	    program_name, PROGRAM_VERSION, __DATE__, RP_VERSION);
 
-    if (pause) {	/* pause execution to set up profiling */
-  	int	c;
-	c = fgetc(stdin);
-    }
-
     RPInitScene();
     RPInitInputVertices();
     RPInitInputPolygons();
 
 	/* let command flags override default scene flags for a few things: */
-	/* (could still be changed by input file) */
+	/* (could still be changed by the input file) */
     if (debug == 2)
 	RPSetSceneFlags(FLAG_VERBOSE2);
     else if (debug == 1)
