@@ -5,7 +5,7 @@ This renderer is a simple line drawing renderer.
 First it paints the scene into the z-buffer using the painters algorithm (does
 not modify color buffer)
 
-Then it decoposes the polygonal geometr into "edges"...
+Then it decoposes the polygonal geometry into "edges"...
 
 Evaluating the edges, it identifies:
 
@@ -27,6 +27,7 @@ technique in these types of algorithms, and this is intended to be a "quick and 
 implementation...
 
 ("culled" above usually means "back-facing" but **_Rendering Plant_** handles
-`CULL_BACK` or `CULL_FRONT`, similar to OpenGL)
+`CULL_BACK` or `CULL_FRONT`, similar to OpenGL, so it could mean "font-facing"
+if the scene was specified as such)
 
 
