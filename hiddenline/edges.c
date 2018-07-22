@@ -306,12 +306,35 @@ process_obj_edges(Object_t *op)
     }	/* for all edges */
 }
 
+#define FILTER5
+#ifdef FILTER3
+static int filter3[3][3] = 
+{
+    { 4, 2, 4 },
+    { 2, 1, 2 },
+    { 4, 2, 4 },
+};
+#endif
+
+#ifdef FILTER5
+static int filter5[5][5] = 
+{
+    {  32,  8,  4,  8,  32 },
+    {  16,  4,  2,  4,  16 },
+    {   8,  2,  1,  2,   8 },
+    {  16,  4,  2,  4,  16 },
+    {  32,  8,  4,  8,  32 },
+};
+#endif
 
 /* simple DDA line function, handles z-buffer and slightly fat line */
 static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t color)
 {
     float	x, y, z, dx, dy, dz, step;
     int		i=1, tx, ty, tz;
+#if (defined FILTER3 || defined FILTER5)
+    int		j, k;
+#endif
 
     if (y0 > y1) {	/* swap */
 
@@ -338,15 +361,25 @@ static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t col
 	if (RPTestDepthFB(tx, ty, (z-(z*DEPTH_BIAS)))) {
 
 		/* we manipulate alhpa for a nice filter effect */
-	    RPPutColorFBPixel(tx-1, ty-1, color.r, color.g, color.b, color.a/4);
-	    RPPutColorFBPixel(tx,   ty-1, color.r, color.g, color.b, color.a/2);
-	    RPPutColorFBPixel(tx+1, ty-1, color.r, color.g, color.b, color.a/4);
-	    RPPutColorFBPixel(tx-1, ty,   color.r, color.g, color.b, color.a/2);
+#if (defined FILTER3)
+		/* filter 3 gaussian */
+	    for (j=-1; j<2; j++) {
+	        for (k=-1; k<2; k++) {
+	            RPPutColorFBPixel(tx+k, ty+j, 
+			color.r, color.g, color.b, color.a/filter3[k+1][j+1]);
+	        }
+	    }
+#elif (defined FILTER5)
+		/* filter 5 gaussian */
+	    for (j=-2; j<3; j++) {
+	        for (k=-2; k<3; k++) {
+	            RPPutColorFBPixel(tx+k, ty+j, 
+			color.r, color.g, color.b, color.a/filter5[k+2][j+2]);
+	        }
+	    }
+#else
 	    RPPutColorFBPixel(tx,   ty,   color.r, color.g, color.b, color.a);
-	    RPPutColorFBPixel(tx+1, ty,   color.r, color.g, color.b, color.a/2);
-	    RPPutColorFBPixel(tx+1, ty+1, color.r, color.g, color.b, color.a/4);
-	    RPPutColorFBPixel(tx,   ty+1, color.r, color.g, color.b, color.a/2);
-	    RPPutColorFBPixel(tx-1, ty+1, color.r, color.g, color.b, color.a/4);
+#endif
         }
 
 	x += dx; y += dy; z += dz;
