@@ -39,15 +39,12 @@
 #include "rp.h"
 #include "hidden.h"
 
-/* enabe this to print debug info about the edges: 
+/* enable this to print debug info about the edges: 
 #define DEBUG_EDGES
 */
 
 /* this is compared with the cos() of angle between tris sharing a edge */
 #define CREASE_TOLERANCE	(0.3)
-
-/* offset edge drawing just a little in the depth buffer */
-#define DEPTH_BIAS		(0.001)
 
 /* tabel of edges for all the objects */
 static ObjEdges_t	*objEdges[MAX_OBJS];
@@ -306,7 +303,12 @@ process_obj_edges(Object_t *op)
     }	/* for all edges */
 }
 
+/*
+ * for best results, use FILTER5
+ *
+ */
 #define FILTER5
+
 #ifdef FILTER3
 static int filter3[3][3] = 
 {
@@ -316,7 +318,7 @@ static int filter3[3][3] =
 };
 #endif
 
-#ifdef FILTER5
+#if defined FILTER3 || defined FILTER5
 static int filter5[5][5] = 
 {
     {  32,  8,  4,  8,  32 },
@@ -334,6 +336,7 @@ static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t col
     int		i=1, tx, ty, tz;
 #if (defined FILTER3 || defined FILTER5)
     int		j, k;
+    float	zsum, weight;
 #endif
 
     if (y0 > y1) {	/* swap */
@@ -358,7 +361,26 @@ static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t col
 
 	tx = (int) (x+0.5); ty = (int) (y+0.5);
 
-	if (RPTestDepthFB(tx, ty, (z-(z*DEPTH_BIAS)))) {
+#if (defined FILTER3 || defined FILTER5)
+	/* rather than use a DEPTH_BIAS as similar algorithms do, we use
+	 * our filter kernal to sample z around the point to get a better
+	 * picture of occlusion
+	 */
+	zsum = 0.0;
+
+	for (j=-2; j<3; j++) {
+	    for (k=-2; k<3; k++) {
+		weight = 32.0/(float)filter5[k+2][j+2];
+		zsum += (weight * RPTestDepthFB(tx+k, ty+j, z));
+	    }
+	}
+
+	zsum /= 32.0;
+
+	if (zsum > 0.5) {
+#else
+	if (RPTestDepthFB(tx, ty, z - (z * 0.001))) {
+#endif
 
 		/* we manipulate alhpa for a nice filter effect */
 #if (defined FILTER3)
