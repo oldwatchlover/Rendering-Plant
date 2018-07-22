@@ -231,6 +231,9 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
 
     /* this triangle gets clipped, go for it... */
 
+	/* mark the original triangle as having been clipped */
+    Flag(tri->flags, FLAG_TRI_CLIPPED);
+
     RPScene.clipped_polys++;
 
     /* copy points to temp buffer */
@@ -427,9 +430,6 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
         add_clipped_tri(op, tri, tp, s+0, s+(i-1), s+i);
 	tp++;
     }
-
-	/* mark the original triangle as having been clipped */
-    Flag(tri->flags, FLAG_TRI_CLIPPED);
 
     return (new_tris);
 }
