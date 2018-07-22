@@ -48,6 +48,7 @@ lex.zz.c
 moray
 paint
 scan
+draw
 
 # Debug files
 *.dSYM/
