@@ -636,6 +636,11 @@ extern int  _RPmylineno;
 			    yylval.floater = atof(yytext);
 			    RET(FLOATER); 
 			}			
+[-+]?[0-9]*\.[0-9]*[eE][-+][0-9]*     {   /* floating point e-notation */
+                            strcat(_RPline_buffer, yytext);
+                            yylval.floater = atof(yytext);
+                            RET(FLOATER);
+                        }
 \"[^\"]*[\"]            {   /* quoted string */
                             strcat(_RPline_buffer, yytext);
                             yylval.string = (char *) malloc(strlen(yytext)+1);

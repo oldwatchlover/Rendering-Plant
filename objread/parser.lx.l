@@ -169,6 +169,11 @@ extern int  obj_mylineno;
 			    zzlval.floater = atof(zztext);
 			    RET(FLOATER); 
 			}			
+[-+]?[0-9]*\.[0-9]*[eE][-+][0-9]*     {   /* floating point e-notation */
+                            strcat(_RPObjline_buffer, zztext);
+			    zzlval.floater = atof(zztext);
+			    RET(FLOATER); 
+			}			
 [a-zA-Z0-9._/-]*         {   /* string */
                             strcat(_RPObjline_buffer, zztext);
                             zzlval.string = (char *) malloc(strlen(zztext));
