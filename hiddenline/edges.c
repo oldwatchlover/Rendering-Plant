@@ -77,12 +77,14 @@ find_edge(int id, int p0, int p1)
 
 /* add edge to the list... either as a shared edge or a new edge */
 static void
-add_edge(int id, int thistri, int p0, int p1)
+add_edge(Object_t *op, int id, int thistri, int p0, int p1)
 {
+    Vtx_t	*vp;
     Edge_t	*ep;
     int		i, thisedge;
 
     ep = (Edge_t *) objEdges[id]->edges;
+    vp = (Vtx_t *) op->verts;
 
     thisedge = find_edge(id, p0, p1);
     i = objEdges[id]->num_edges;
@@ -98,6 +100,8 @@ add_edge(int id, int thistri, int p0, int p1)
 
 #ifdef DEBUG_EDGES
 	fprintf(stderr,"\tadding new edge: p0 = %d, p1 = %d from tri %d\n",p0,p1,thistri);
+	fprintf(stderr,"\t\t(%d,%d) -- (%d,%d)\n",
+		vp[p0].sx,vp[p0].sy, vp[p1].sx,vp[p1].sy);
 #endif
     } else {			/* add tri to an existing edge */
 
@@ -108,6 +112,8 @@ add_edge(int id, int thistri, int p0, int p1)
 #ifdef DEBUG_EDGES
 	fprintf(stderr,"\tadding tri (%d) to edge (%d): p0 = %d, p1 = %d\n",
 		thistri,thisedge,p0,p1);
+	fprintf(stderr,"\t\t(%d,%d) -- (%d,%d)\n",
+		vp[p0].sx,vp[p0].sy, vp[p1].sx,vp[p1].sy);
 #endif
         } else {
 	    	/* error, sholdn't happen except degenerate data */
@@ -158,12 +164,12 @@ create_obj_edges(Object_t *op)
 #endif
 
 	} else {
-	    add_edge(op->id, i, tp->v0, tp->v1); 
-	    add_edge(op->id, i, tp->v1, tp->v2); 
-	    add_edge(op->id, i, tp->v2, tp->v0); 
 #ifdef DEBUG_EDGES
-	    fprintf(stderr,"adding edges for tri %d\n",i);
+	    fprintf(stderr,"adding edges for tri %d %08x\n",i,tp->flags);
 #endif
+	    add_edge(op, op->id, i, tp->v0, tp->v1); 
+	    add_edge(op, op->id, i, tp->v1, tp->v2); 
+	    add_edge(op, op->id, i, tp->v2, tp->v0); 
         }
     }
 }
@@ -374,6 +380,21 @@ draw_edges(Object_t *op)
 	    x1 = vp[ep[i].v1].sx;
 	    y1 = vp[ep[i].v1].sy;
 	    z1 = vp[ep[i].v1].sz;
+
+#ifdef DEBUG_EDGES
+	if (Flagged(ep[i].flags, FLAG_EDGE_SILHOUETTE)) {
+	    fprintf(stderr,"drawing silhouette edge:\t%d, %d\n",
+		ep[i].v0, ep[i].v1);
+	    fprintf(stderr,"\t(%d,%d) -- (%d,%d)\n",
+		x0,y0,x1,y1);
+	}
+	if (Flagged(ep[i].flags, FLAG_EDGE_CREASE)) {
+	    fprintf(stderr,"drawing crease edge:\t\t%d, %d\n",
+		ep[i].v0, ep[i].v1);
+	    fprintf(stderr,"\t(%d,%d) -- (%d,%d)\n",
+		x0,y0,x1,y1);
+	}
+#endif
 
             draw_line(x0, y0, z0, x1, y1, z1, black);
 
