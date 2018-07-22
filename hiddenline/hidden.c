@@ -1,9 +1,9 @@
 
 
 /*
- * File:        paint.c
+ * File:        hidden.c
  *
- * The top of the painter's algorithm hardware algorithm simulator rasterizer
+ * The top of the hidden line renderer
  *
  */
 
@@ -38,47 +38,44 @@
 #include <math.h>
 
 #include "rp.h"
-#include "paint.h"
+#include "hidden.h"
 
-int     culled_polys = 0;
-int     drawn_polys = 0;
+int	total_edges = 0;
+int	drawn_edges = 0;
+
+/* from libpaint: */
+extern void     paint_tri(Object_t *op, Tri_t *tri, int usecfb);
 
 /*
- * paint the entire scene.
+ * draw the entire scene.
  *
  */
 void
-paint_scene(void)
+draw_scene(void)
 {
+    rgba_t	white = {255, 255, 255, 0};
     Object_t	*op;
     Tri_t	*tri;
     float       progress = 0.0;
     int         i, j, retval = CLIP_TRIVIAL_ACCEPT;
 
-    fprintf(stderr,"Painting Scene:\n");
+    fprintf(stderr,"Drawing Scene:\n");
     fprintf(stderr,"\tResolution %d x %d\n",RPScene.xres,RPScene.yres);
     fprintf(stderr,"\t[%d] objects...\n",RPScene.obj_count);
     fprintf(stderr,"\t[%d] lights...\n",RPScene.light_count);
 
 	/* init frame buffer and z-buffer: */
-    RPClearColorFB(NULL);
+    RPClearColorFB(&white);
     RPClearDepthFB(NULL);
     RPLoadBackgroundImage();
     RPSetSceneFlags(FLAG_PERSP_TEXTURE); /* tell pipeline to persp correct tex coords */
+    RPClearSceneFlags(FLAG_RENDER_02);
     RPProcessObjects(TRUE); 		/* tranform objects to camera space */
 					/* TRUE flag also does projection */
 
-    if (Flagged(RPScene.flags, FLAG_FOG)) {
-	rgba_t	temp;
-	temp.r = (u8) Clamp0255(RPScene.fog_color.r * MAX_COLOR_VAL);
-	temp.g = (u8) Clamp0255(RPScene.fog_color.g * MAX_COLOR_VAL);
-	temp.b = (u8) Clamp0255(RPScene.fog_color.b * MAX_COLOR_VAL);
-	temp.a = (u8) Clamp0255(RPScene.fog_color.a * MAX_COLOR_VAL);
-	RPClearColorFB(&temp);
-    }
+    fprintf(stderr,"Progress:  %5.2f %%",progress*50.0);
 
-    fprintf(stderr,"Progress:  %5.2f %%",progress*100.0);
-
+	/* fill the z-buffer first */
     for (i=0; i<RPScene.obj_count; i++) {
 
 	op = RPScene.obj_list[i];
@@ -97,7 +94,7 @@ paint_scene(void)
         	    retval = RPClipTriangle(op, tri);
 
 		if (retval > CLIP_TRIVIAL_REJECT)
-		    paint_tri(op, tri, TRUE);
+		    paint_tri(op, tri, FALSE);
             }
 
 
@@ -107,7 +104,41 @@ paint_scene(void)
         }
 
         progress = (float)i/(float)RPScene.obj_count;
-        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*100.0);
+        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*50.0);
+    }
+
+	/* process edges */
+    for (i=0; i<RPScene.obj_count; i++) {
+
+	op = RPScene.obj_list[i];
+
+        if (op->type == OBJ_TYPE_SPHERE) {
+
+		/* can't handle these yet */
+
+	} else if (op->type == OBJ_TYPE_POLY) {
+
+	    create_obj_edges(op);
+	    process_obj_edges(op);
+        }
+    }
+
+	/* paint edges */
+    for (i=0; i<RPScene.obj_count; i++) {
+
+	op = RPScene.obj_list[i];
+
+        if (op->type == OBJ_TYPE_SPHERE) {
+
+		/* can't handle these yet */
+
+	} else if (op->type == OBJ_TYPE_POLY) {
+
+	    draw_edges(op);
+	}
+
+        progress = (float)i/(float)RPScene.obj_count;
+        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",(progress*50.0)+50.0);
     }
 
     fprintf(stderr,"\b\b\b\b\b\b\b\b100 %% ... done!\n");
@@ -116,16 +147,14 @@ paint_scene(void)
     fprintf(stderr,"------------------------------------------------------\n");
     fprintf(stderr,"%s : [%'16d] input polygons\n",
             program_name, RPScene.input_polys);
-    fprintf(stderr,"%s : [%'16d] culled polygons\n",
-            program_name, culled_polys);
-    fprintf(stderr,"%s : [%'16d] tiny rejected polygons\n",
-            program_name, RPScene.tiny_rejected_polys);
     fprintf(stderr,"%s : [%'16d] trivially rejected polygons\n",
             program_name, RPScene.trivial_rejected_polys);
     fprintf(stderr,"%s : [%'16d] clipped polygons\n",
             program_name, RPScene.clipped_polys);
-    fprintf(stderr,"%s : [%'16d] drawn polygons\n",
-            program_name, drawn_polys);
+    fprintf(stderr,"%s : [%'16d] total edges\n",
+            program_name, total_edges);
+    fprintf(stderr,"%s : [%'16d] drawn edges\n",
+            program_name, drawn_edges);
     fprintf(stderr,"\n");
 }
 

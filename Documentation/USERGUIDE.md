@@ -19,6 +19,7 @@ the **_Rendering Plant_** distribution:
         moray           a simple ray tracer.
         paint           a GPU style painter's algorithm.
         scan            a scanline renderer.
+        draw            a hidden-line renderer.
 
 The `input_file` is a text based scene description to render described
 briefly below (the full input language is detailed in another document).

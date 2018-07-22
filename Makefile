@@ -30,36 +30,44 @@ include ./Makerules.mk
 CFLAGS +=		-I./include
 
 moray: CFLAGS +=	-DMORAY -I./ray
+draw:  CFLAGS +=	-DDRAW -I./hiddenline
 paint: CFLAGS +=	-DPAINT -I./painters
 scan:  CFLAGS +=	-DSCAN -I./scanline
 
 COMMON_LDFLAGS =	-L/usr/local/opt/flex/lib -L/usr/local/opt/gettext/lib -L./rp -L./objread 
 
 moray: LDFLAGS +=	$(COMMON_LDFLAGS) -L./ray
+draw:  LDFLAGS +=	$(COMMON_LDFLAGS) -L./hiddenline -L./painters
 paint: LDFLAGS +=	$(COMMON_LDFLAGS) -L./painters
 scan:  LDFLAGS +=	$(COMMON_LDFLAGS) -L./scanline -L./ray
 
 MORAY_OBJS =		moray.o
+DRAW_OBJS =		draw.o
 PAINT_OBJS =		paint.o
 SCAN_OBJS =		scan.o
 
 moray: LDLIBS =		-lrp -lobj -lray -lfl -lm 
+draw:  LDLIBS =		-lrp -lobj -lhide -lpaint -lfl -lm 
 paint: LDLIBS =		-lrp -lobj -lpaint -lfl -lm 
-scan: LDLIBS =		-lrp -lobj -lscan -lray -lfl -lm
+scan:  LDLIBS =		-lrp -lobj -lscan -lray -lfl -lm
 
 LIBOBJ =		objread/libobj.a
 LIBRP 	=		rp/librp.a
 LIBRAY 	=		ray/libray.a
+LIBHIDE	=		hiddenline/libhide.a
 LIBPAINT =		painters/libpaint.a
 LIBSCAN =		scanline/libscan.a
 
 
 default:	all 
 
-all:	$(LIBOBJ) $(LIBRP) $(LIBRAY) $(LIBPAINT) $(LIBSCAN) moray paint scan 
+all:	$(LIBOBJ) $(LIBRP) $(LIBRAY) $(LIBHIDE) $(LIBPAINT) $(LIBSCAN) moray draw paint scan 
 
 moray:	$(MORAY_OBJS) $(LIBOBJ) $(LIBRP) $(LIBRAY) 
 	$(CC) -o $@ $(MORAY_OBJS) $(LDFLAGS) $(LDLIBS)
+
+draw:	$(DRAW_OBJS) $(LIBOBJ) $(LIBRP) $(LIBPAINT) $(LIBHIDE) 
+	$(CC) -o $@ $(DRAW_OBJS) $(LDFLAGS) $(LDLIBS)
 
 paint:	$(PAINT_OBJS) $(LIBOBJ) $(LIBRP) $(LIBPAINT) 
 	$(CC) -o $@ $(PAINT_OBJS) $(LDFLAGS) $(LDLIBS)
@@ -70,23 +78,19 @@ scan:	$(SCAN_OBJS) $(LIBOBJ) $(LIBRP) $(LIBRAY) $(LIBSCAN)
 clean:
 	+$(MAKE) -C rp clean
 	+$(MAKE) -C ray clean
+	+$(MAKE) -C hiddenline clean
 	+$(MAKE) -C painters clean
 	+$(MAKE) -C scanline clean
 	+$(MAKE) -C objread clean
 	rm -f moray $(MORAY_OBJS)
+	rm -f draw $(DRAW_OBJS)
 	rm -f paint $(PAINT_OBJS)
 	rm -f scan $(SCAN_OBJS)
 
-checkpoint:
-	cp -v M* *.[ch] .save
-	cp -v rp/M* rp/*.[ch] rp/.save
-	cp -v include/*.[ch] include/.save
-	cp -v objread/M* objread/*.[ch] objread/.save
-	cp -v ray/M* ray/*.[ch] ray/.save
-	cp -v scanline/M* scanline/*.[ch] scanline/.save
-	cp -v painters/M* painters/*.[ch] painters/.save
-
 moray.o:	main.c
+	$(CC) $(CFLAGS) -o $@ -c $<
+
+draw.o:		main.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 paint.o:	main.c
@@ -103,6 +107,9 @@ $(LIBRAY):	ray/*.c
 
 $(LIBPAINT):	painters/*.c
 	+$(MAKE) -C painters libpaint.a
+
+$(LIBHIDE):	hiddenline/*.c
+	+$(MAKE) -C hiddenline libhide.a
 
 $(LIBSCAN):	scanline/*.c
 	+$(MAKE) -C scanline libscan.a

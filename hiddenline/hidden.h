@@ -1,9 +1,9 @@
 
 /*
- * File:        paint.h
+ * File:        hidden.h
  *
  * This include file holds all of the define/typedef/externs for the 
- * GPU algorithm simuator renderer.
+ * hidden line renderer.
  *
  */
 
@@ -33,28 +33,50 @@
  *
  */
 
-#ifndef __PAINT_H__
-#define __PAINT_H__
+#ifndef __HIDDEN_H__
+#define __HIDDEN_H__
 
 	/* defines: */
+
+#define FLAG_EDGE_CULL_BACK	FLAG_CULL_BACK		/* 0x001 */
+#define FLAG_EDGE_CULL_FRONT	FLAG_CULL_FRONT		/* 0x002 */
+#define FLAG_EDGE_SILHOUETTE	0x0004
+#define FLAG_EDGE_CREASE	0x0008
 
 #define MAX_ZVAL	REALLY_BIG_FLOAT
 
 	/* data types: */
 
+	/* an edge structure */
+typedef struct {
+
+    u32		flags;
+    int		tri0, tri1;
+    int		v0, v1;  
+
+} Edge_t;
+
+
+	/* holds list of edges for an object */
+typedef struct {
+
+    Edge_t	*edges;
+    int		num_edges;
+
+} ObjEdges_t;
+
+
 	/* extern variables and functions: */
-extern int	culled_polys, drawn_polys;
+extern int	total_edges, drawn_edges;
 
-/* from paint.c */
-extern void	paint_scene(void);
+/* from hidden.c */
+extern void	draw_scene(void);
 
-/* from rasterize.c */
-extern void     paint_tri(Object_t *op, Tri_t *tri, int usecfb);
-
-/* from paintshade.c */
-extern void	shade_pixel(Object_t *op, 
-			xyz_t *N, xyz_t *point, xyz_t *view, Colorf_t *shade);
+/* from edges.c */
+extern void		create_obj_edges(Object_t *op);
+extern void		process_obj_edges(Object_t *op);
+extern void		draw_edges(Object_t *op);
 
 #endif
-/* __PAINT_H__ */
+/* __HIDDEN_H__ */
 

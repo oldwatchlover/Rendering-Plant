@@ -52,7 +52,11 @@
 #   include "ray.h"
 #   define PROGRAM_VERSION	"2.0"
 #   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-m samples] [-v] [-y] scenefile"
-    static int		use_multisample = 0;
+#endif
+#ifdef DRAW
+#   include "hidden.h"
+#   define PROGRAM_VERSION	"0.1"
+#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-v] [-y] scenefile"
 #endif
 #ifdef SCAN
 #   include "scan.h"
@@ -73,18 +77,29 @@
 int
 main(int argc, char *argv[])
 {
-    static rgba_t	sky_blue = {135, 206, 235, MAX_COLOR_VAL};
-    char		cppdefs[512], usage_string[256];
+    rgba_t		sky_blue = {135, 206, 235, MAX_COLOR_VAL};
     clock_t		begin, end;
     double		elapsed;
-    int			use_blue = FALSE, debug = FALSE, parsedebug = FALSE;
+    int			parsedebug = FALSE;
+    char		cppdefs[256], usage_string[256];
 
-    setprogname(argv[0]);
-    setlocale(LC_ALL,"");
+    setprogname(argv[0]);	/* stdlib... we'll want this later */
+    setlocale(LC_ALL,"");	/* for prettier printing */
+
     strcpy(cppdefs, "");
     sprintf(usage_string,"usage : %s %s", argv[0], USAGE_STRING);
 
     RPInit(argv[0], 0x0);	/* must call this first */
+    RPInitScene(); 		/* initialize the scene */
+
+#if (defined  PAINT || defined SCAN || defined DRAW)
+	/* if the renderer does not support implicit sphere geometry: */ 
+    RPEnableSphereSupport(FALSE);
+#endif
+
+	/* command flags that set scene/render state MAY be overridden by
+	 * the scene input file...
+	 */
 
     while ((argc > 1) && (argv[1][0] == '-')) {
 	switch(argv[1][1]) {
@@ -98,26 +113,27 @@ main(int argc, char *argv[])
 	    break;
 	    
           case 'b':
-	    use_blue = TRUE;
+            RPSetBackgroundColor(&sky_blue);
 	    break;
 	    
 	  case 'd':
-	    debug++;
-	    if (argv[1][2] == 'd')
-	        debug++;
+	    if (argv[1][2] == 'd') {
+	        RPSetSceneFlags(FLAG_VERBOSE2);
+	    } else {
+	        RPSetSceneFlags(FLAG_VERBOSE);
+	    }
 	    break;
 	    
 #ifdef  MORAY	    /* only ray tracer does multisampling */
 	  case 'm': /* option flag to set multisampling parameter: */
-	    use_multisample = Clamp0x(atoi(argv[2]), 5);
+	    RPSetSceneFlags(FLAG_SCENE_MULTISAMPLE);
+	    RPScene.num_samples = Clamp0x(atoi(argv[2]), 5);
 	    argc--;
 	    argv++;
 	    break;
 #endif
-
 	  case 'v':
-	    if (debug == 0)
-	        debug++;
+	    RPSetSceneFlags(FLAG_VERBOSE);
 	    break;
 
 	  case 'y':
@@ -143,38 +159,18 @@ main(int argc, char *argv[])
     fprintf(stderr,"%s : Version %s, compiled %s against Rendering Plant version %s\n",
 	    program_name, PROGRAM_VERSION, __DATE__, RP_VERSION);
 
-    RPInitScene();
+	/* these temp buffers are used to read in scene geometry */
     RPInitInputVertices();
     RPInitInputPolygons();
 
-	/* let command flags override default scene flags for a few things: */
-	/* (could still be changed by the input file) */
-    if (debug == 2)
-	RPSetSceneFlags(FLAG_VERBOSE2);
-    else if (debug == 1)
-	RPSetSceneFlags(FLAG_VERBOSE);
-
-    if (use_blue)
-        RPSetBackgroundColor(&sky_blue);
-
-#ifdef  MORAY
-    if (use_multisample > 0) {
-	RPSetSceneFlags(FLAG_SCENE_MULTISAMPLE);
-	RPScene.num_samples = use_multisample;
-    }
-#endif
-
-#if (defined  PAINT || defined SCAN)
-	/* if the renderer does not support implicit sphere geometry: */ 
-    RPEnableSphereSupport(FALSE);
-#endif
-
+	/* read the input scene - returns FALSE if there was a problem */
     if (!RPParseInputFile(argv[1], parsedebug, cppdefs)) {
 	fprintf(stderr,"%s : ERROR : could not parse input file [%s], exiting...\n",
 			program_name, argv[1]);
 	exit(EXIT_FAILURE);
     }
 
+	/* now we've read in the scene, free these temp buffers */
     RPFreeInputVertices();
     RPFreeInputPolygons();
 
@@ -185,6 +181,8 @@ main(int argc, char *argv[])
 	    /* render scene */
 #if defined (MORAY)
     raytrace_scene();
+#elif defined (DRAW)
+    draw_scene();
 #elif defined (PAINT)
     paint_scene();
 #elif defined (SCAN)

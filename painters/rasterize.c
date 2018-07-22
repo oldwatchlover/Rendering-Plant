@@ -47,7 +47,7 @@
 #include "paint.h"
 
 static void bary_tri_setup(Object_t *op, Tri_t *tri, 
-			Vtx_t *p0, Vtx_t *p1, Vtx_t *p2);
+			Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int usecfb);
 
 /* compute attribute dx and dy from plane equation */
 static void
@@ -62,7 +62,7 @@ pleq_dxdy(float inv_r, int ax, int ay, int bx, int by, float ac, float bc,
 }
 
 void
-paint_tri(Object_t *op, Tri_t *tri)
+paint_tri(Object_t *op, Tri_t *tri, int usecfb)
 {
     Vtx_t	*p0, *p1, *p2;
 
@@ -73,7 +73,7 @@ paint_tri(Object_t *op, Tri_t *tri)
     p1 = &(op->verts[tri->v1]);
     p2 = &(op->verts[tri->v2]);
 
-    bary_tri_setup(op, tri, p0, p1, p2);
+    bary_tri_setup(op, tri, p0, p1, p2, usecfb);
 }
 
 
@@ -89,7 +89,7 @@ paint_tri(Object_t *op, Tri_t *tri)
  *
  */
 static void
-bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2)
+bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int usecfb)
 {
     Vtx_t	*tmpp, tmp_buffer;
     rgba_t	tex_samp;
@@ -386,15 +386,24 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2)
 	    thiscolor.b = Clamp0255(colorsum.b * MAX_COLOR_VAL);
 	    thiscolor.a = Clamp0255(colorsum.a * MAX_COLOR_VAL);
 
-	    if (Flagged(RPScene.flags, FLAG_ZBUFFER)) {
+	    if (usecfb) {
+
+	        if (Flagged(RPScene.flags, FLAG_ZBUFFER)) {
+		    if (RPTestDepthFB(x, y, thisz)) {
+		        RPPutDepthFBPixel(x, y, thisz);
+		        RPPutColorFBPixel(x, y, (int)thiscolor.r, (int)thiscolor.g,
+				  (int)thiscolor.b, (int)thiscolor.a);
+		    }
+	        } else {
+		    RPPutColorFBPixel(x, y, (int)thiscolor.r, (int)thiscolor.g,
+			      (int)thiscolor.b, (int)thiscolor.a);
+	        }
+
+	    } else { 	/* write zbuffer only */
+
 		if (RPTestDepthFB(x, y, thisz)) {
 		    RPPutDepthFBPixel(x, y, thisz);
-		    RPPutColorFBPixel(x, y, (int)thiscolor.r, (int)thiscolor.g,
-				  (int)thiscolor.b, (int)thiscolor.a);
 		}
-	    } else {
-		RPPutColorFBPixel(x, y, (int)thiscolor.r, (int)thiscolor.g,
-			      (int)thiscolor.b, (int)thiscolor.a);
 	    }
 	    
 	    if (x == (int)(xminor))
@@ -419,7 +428,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2)
     }
 
     /* optionally outline triangle, useful for debugging: */
-    if (Flagged(RPScene.generic_flags, FLAG_RENDER_02)) {
+    if (Flagged(RPScene.generic_flags, FLAG_RENDER_02) && usecfb) {
         rgba_t	red = {MAX_COLOR_VAL, 0, 0, MAX_COLOR_VAL};
 	RPDrawColorFBLine(p0->sx, p0->sy, p1->sx, p1->sy, red, TRUE);
 	RPDrawColorFBLine(p1->sx, p1->sy, p2->sx, p2->sy, red, TRUE);
