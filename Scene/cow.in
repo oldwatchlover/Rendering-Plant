@@ -13,15 +13,15 @@ output("cow.bmp", XRES, YRES);
 light(-1000.0, 1000.0, 1000.0, 0.6, 0.6, 0.6);
 light(1000.0, 1000.0, 1000.0, 0.6, 0.6, 0.6);
 
-depthrange(10.0, 3000.0);
 camera(10.0, 20.0, 60.0,  0, 0, 0,  0, 1, 0,  20.0, XRES/YRES);
+depthrange(10.0, 1000.0);
 
 identity(MTX_MODEL);
 translate(0.0, 0.0, 0.0);
 rotate(-30.0, 0.0, 1.0, 0.0);
 scale(2.0, 2.0, 2.0);
 
-objflags(SMOOTHSHADE LIGHTING);
+objflags(SMOOTHSHADE LIGHTING CULL_BACK);
 
 material(color, 1.0, 1.0, 1.0, 1.0);
 material(ambient, 0.2, 0.2, 0.2, 1.0);
