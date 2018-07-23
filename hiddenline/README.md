@@ -33,6 +33,17 @@ does not currently do that.
 `CULL_BACK` or `CULL_FRONT`, similar to OpenGL allowing the user to select which
 faces get culled, so it could mean "font-facing" if the scene was specified as such)
 
+**_draw_** accepts in the input stream these `genericflags()` scene flags:
+
+    RENDER01 : disable clipping.
+
+    RENDER03 : render the scene in color before rendering the edges - if you
+               set your material properties correctly this can create a very
+               effective "toon shading" effect.
+
+There is also the additional command line option `-t` which has the same effect
+as including `genericflags(RENDER03);` in your input file. 
+
 BUGS:
 
     - if multiple polygons get clipped, generating the same new clipped point,

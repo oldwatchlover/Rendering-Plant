@@ -7,6 +7,14 @@
 #define XRES	1920
 #define YRES	1080
 
+/*
+ * "draw", the hidden-line renderer can do an easy "toon shade" effect easily
+#define TOONSHADE
+ */
+#ifdef TOONSHADE
+genericflags(RENDER03);
+#endif
+
 sceneflags(ZBUFFER);
 
 output("chair.bmp", XRES, YRES);
@@ -23,11 +31,16 @@ translate(0.0, 0.0, 0.0);
 rotate(135.0, 0.0, 1.0, 0.0);
 scale(0.25, 0.25, 0.25);
 
-material(color, 0.780392, 0.568627, 0.113725, 1.0);
-material(ambient, 0.2, 0.2, 0.2, 1.0);
-material(diffuse, 0.7, 0.7, 0.7, 1.0);
-material(specular, 1.0, 1.0, 1.0, 1.0);
-material(shiny, 180.0);
+#ifdef TOONSHADE
+    material(color, 0.780392, 0.568627, 0.113725, 1.0);
+    material(ambient, 1.0, 1.0, 1.0, 1.0);
+#else
+    material(color, 0.780392, 0.568627, 0.113725, 1.0);
+    material(ambient, 0.2, 0.2, 0.2, 1.0);
+    material(diffuse, 0.7, 0.7, 0.7, 1.0);
+    material(specular, 1.0, 1.0, 1.0, 1.0);
+    material(shiny, 180.0);
+#endif
 
 loadobj("./obj/chair.obj");
 

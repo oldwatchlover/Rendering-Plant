@@ -57,7 +57,7 @@ draw_scene(void)
     Object_t	*op;
     Tri_t	*tri;
     float       progress = 0.0;
-    int         i, j, retval = CLIP_TRIVIAL_ACCEPT;
+    int         i, j, retval = CLIP_TRIVIAL_ACCEPT, paintshade = FALSE;
 
     fprintf(stderr,"Drawing Scene:\n");
     fprintf(stderr,"\tResolution %d x %d\n",RPScene.xres,RPScene.yres);
@@ -72,6 +72,15 @@ draw_scene(void)
     RPClearSceneFlags(FLAG_RENDER_02);
     RPProcessObjects(TRUE); 		/* tranform objects to camera space */
 					/* TRUE flag also does projection */
+
+	/* use the generic flags to decide if we want to paint the objects into
+         * the color frame buffer (as well as the zbuffer) during pre-processing.
+         * this permits an effective "toon shade" effect to be relalized.
+	 */
+
+    if (Flagged(RPScene.generic_flags, FLAG_RENDER_03)) {
+	paintshade = TRUE;
+    }
 
     fprintf(stderr,"Progress:  %5.2f %%",progress*50.0);
 
@@ -94,7 +103,7 @@ draw_scene(void)
         	    retval = RPClipTriangle(op, tri);
 
 		if (retval > CLIP_TRIVIAL_REJECT)
-		    paint_tri(op, tri, FALSE);
+		    paint_tri(op, tri, paintshade);
             }
 
 

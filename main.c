@@ -55,8 +55,8 @@
 #endif
 #ifdef DRAW
 #   include "hidden.h"
-#   define PROGRAM_VERSION	"0.1"
-#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-v] [-y] scenefile"
+#   define PROGRAM_VERSION	"0.5"
+#   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-t] [-v] [-y] scenefile"
 #endif
 #ifdef SCAN
 #   include "scan.h"
@@ -132,6 +132,13 @@ main(int argc, char *argv[])
 	    argv++;
 	    break;
 #endif
+
+#ifdef DRAW
+	  case 't':	/* force a cheap "toon shade" effect */
+	    RPSetGenericSceneFlags(FLAG_RENDER_03);
+	    break;
+#endif
+
 	  case 'v':
 	    RPSetSceneFlags(FLAG_VERBOSE);
 	    break;
