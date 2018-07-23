@@ -29,7 +29,8 @@ directories.
 
 ### OPTIONS
 These options are for the renderers distributed with **_Rendering Plant_** that
-link with `main.c`
+link with `main.c`. Not all options are used by all renderers. See renderer documentation
+or code.
 
 The following options are available:
 
@@ -57,6 +58,15 @@ The following options are available:
                 (from the camera through the frame buffer) support multsampling;
                 <samp> * <samp> samples are cast for each primary ray and averaged
                 to determine the final frame buffer pixel value.
+
+
+    -t          Toonshade. Only used by _draw_. Paints the image into the color
+                buffer using provided colors/materials before drawing the line
+                image. With proper materials, this can create a nice "toon shading"
+                effect.
+
+
+    -v          Verbose. Same as -d.
 
 
     -y          Enable debug statements from yacc (bison).
