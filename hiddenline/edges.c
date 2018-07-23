@@ -43,6 +43,8 @@
 #define DEBUG_EDGES
 */
 
+#define DEPTH_BIAS	(0.001)
+
 /* this is compared with the cos() of angle between tris sharing a edge */
 #define CREASE_TOLERANCE	(0.3)
 
@@ -304,8 +306,9 @@ process_obj_edges(Object_t *op)
 }
 
 /*
- * for best results, use FILTER5
+ * for best results, use FILTER5 (slightly fatter line)
  *
+#define FILTER3
  */
 #define FILTER5
 
@@ -379,7 +382,7 @@ static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t col
 
 	if (zsum > 0.5) {
 #else
-	if (RPTestDepthFB(tx, ty, z - (z * 0.001))) {
+	if (RPTestDepthFB(tx, ty, z - (z * DEPTH_BIAS))) {
 #endif
 
 		/* we manipulate alhpa for a nice filter effect */
