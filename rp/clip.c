@@ -153,7 +153,7 @@ plerp_all(float d, Vtx_t *v1, Vtx_t *v2, Vtx_t *out)
  * buffer has been allocated - in our implementation, we use realloc() to extend
  * the objects vertex and triangle buffers and add them to the end.
  * 
- * The flaggs FLAG_TRI_CLIPPED and FLAG_TRI_CLIP_GEN are used in here and 
+ * The flags FLAG_TRI_CLIPPED and FLAG_TRI_CLIP_GEN are used in here and 
  * elsewhere in the renderer to identify clipped geometry and possibly handle 
  * them differently. FLAG_TRI_CLIPPED is an optimization that allows us
  * to skip rendering those triangles sine thier visible portions are
