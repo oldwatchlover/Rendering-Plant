@@ -7,7 +7,7 @@ all the useful and necessary stuff to write a 3D renderer. It includes:
 - scene file input parsing and loading
 - scene, object, material and render state management
 - geometry input (including Wavefront .obj files)
-- geoemtry processing pipeline (transform, clip, project to screen coordinates)
+- geometry processing pipeline (transform, clip, project to screen coordinates)
 - texture input and sampling
 - utility functions
 
