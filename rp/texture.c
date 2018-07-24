@@ -145,6 +145,12 @@ RPFreeTexture(int texnum)
     Texture_t	*tp;
     int		j;
 
+    if (texnum < 0) {
+	fprintf(stderr,"%s : ERROR : %s : %d : trying to free texture (%d)\n",
+		program_name, __FILE__,__LINE__,texnum);
+	return;
+    }
+
     if (texnum > (MAX_TEXTURES+1)) {
 	fprintf(stderr,"%s : ERROR : attempt to free texture slot %d\n",
 		program_name, texnum);
@@ -193,6 +199,12 @@ u32
 RPGetTextureFlags(int texnum)
 {
     Texture_t	*tex;
+
+    if (texnum < 0) {
+	fprintf(stderr,"%s : ERROR : %s : %d : trying to get flags of texture (%d)\n",
+		program_name, __FILE__,__LINE__,texnum);
+	return(0x0);
+    }
 
     tex = RPScene.texture_list[texnum];
     return(tex->flags);
@@ -279,6 +291,12 @@ RPPointSampleTexture(int texnum, float s, float t, float inv_w)
     int		x, y;
 
 
+    if (texnum < 0) {
+	fprintf(stderr,"%s : ERROR : %s : %d : trying to sample texture (%d)\n",
+		program_name, __FILE__,__LINE__,texnum);
+	return(black);
+    }
+
     tex = RPScene.texture_list[texnum];
     if (tex == (Texture_t *) NULL) {
 	fprintf(stderr,"%s : ERROR : %s : %d : NULL texture (%d) in sample func\n",
@@ -314,6 +332,7 @@ RPFilterSampleTexture(int texnum, float s, float t, float inv_w,
 		      float DxDw, float DyDw)
 {
     rgba_t	samp, tx0, tx1, tx2, tx3;
+
 
     tx0 = RPPointSampleTexture(texnum, 
 			       s-(DxDs*0.5)-(DyDs*0.5), 
@@ -381,6 +400,12 @@ RPSampleBumpTexture(int texnum, float nx, float ny, float nz, float s, float t, 
     xyz_t	tn;
     int		x, y;
     float	sgrad, tgrad;
+
+    if (texnum < 0) {
+	fprintf(stderr,"%s : ERROR : %s : %d : trying to sample texture (%d)\n",
+		program_name, __FILE__,__LINE__,texnum);
+	return(black);
+    }
 
     tex = RPScene.texture_list[texnum];
 

@@ -205,7 +205,7 @@ process_obj_edges(Object_t *op)
 
 	    if (t0 == (Tri_t *) NULL) t0 = t1;
 
-	    if (Flagged(op->material->flags, FLAG_CULL_BACK)) {
+	    if (Flagged(op->flags, FLAG_CULL_BACK)) {
 		if (Flagged(t0->flags, FLAG_CULL_BACK)) {
 	            Flag(ep[i].flags, FLAG_CULL_BACK);	/* don't draw */
 		} else {
@@ -217,7 +217,7 @@ process_obj_edges(Object_t *op)
 		}
 	    }
 
-	    if (Flagged(op->material->flags, FLAG_CULL_FRONT)) {
+	    if (Flagged(op->flags, FLAG_CULL_FRONT)) {
 		if (Flagged(t0->flags, FLAG_CULL_FRONT)) {
 	            Flag(ep[i].flags, FLAG_CULL_FRONT);	/* don't draw */
 		} else {
@@ -242,7 +242,7 @@ process_obj_edges(Object_t *op)
 #endif
 	    }
 
-	    if (Flagged(op->material->flags, FLAG_CULL_BACK)) {
+	    if (Flagged(op->flags, FLAG_CULL_BACK)) {
 			/* both backfacing, don't draw */
 		if (Flagged(t0->flags, FLAG_CULL_BACK) &&
 		    Flagged(t1->flags, FLAG_CULL_BACK)) {
@@ -267,7 +267,7 @@ process_obj_edges(Object_t *op)
 		}
             }
 
-	    if (Flagged(op->material->flags, FLAG_CULL_FRONT)) {
+	    if (Flagged(op->flags, FLAG_CULL_FRONT)) {
 			/* both backfacing, don't draw */
 		if (Flagged(t0->flags, FLAG_CULL_FRONT) &&
 		    Flagged(t1->flags, FLAG_CULL_FRONT)) {

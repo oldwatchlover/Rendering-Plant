@@ -136,7 +136,7 @@ RPProcessOneTriangle(Object_t *op, Tri_t *tri)
     v1 = tri->v1;
     v2 = tri->v2;
 
-    if (Flagged(op->material->flags, FLAG_RANDSHADE)) {
+    if (Flagged(op->flags, FLAG_RANDSHADE)) {
         vp[v0].r = RPRandom();
         vp[v0].g = RPRandom();
         vp[v0].b = RPRandom();

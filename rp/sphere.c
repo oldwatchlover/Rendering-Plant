@@ -122,9 +122,9 @@ RPAddSphere(xyz_t center, float radius)
 		 * grab it and make sure SMOOTH shading, CULL_BACK are on:
 		 */
         op = RPScene.obj_list[RPScene.obj_count-1];
-	UnFlag(op->material->flags, FLAG_FLATSHADE);
-	UnFlag(op->material->flags, FLAG_CULL_FRONT);
-	Flag(op->material->flags, FLAG_CULL_BACK);
+	UnFlag(op->flags, FLAG_FLATSHADE);
+	UnFlag(op->flags, FLAG_CULL_FRONT);
+	Flag(op->flags, FLAG_CULL_BACK);
 
 		/* calculate surface normals: */
 	RPCalculateVertexNormals(op, FALSE);

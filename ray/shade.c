@@ -137,7 +137,7 @@ calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op)
         tex_samp = RPPointSampleTexture(op->material->texid, s, t, 1.0);
 
         if (Flagged(RPGetTextureFlags(op->material->texid), FLAG_TXT_MODULATE) &&
-	    Flagged(op->material->flags, FLAG_VERTSHADE)) {
+	    Flagged(op->flags, FLAG_VERTSHADE)) {
 			/* use barycentric coords to calc interp vertex colors */
     	    pointcolor->r = tsp->u * vp[tp->v0].r +
 			    tsp->v * vp[tp->v1].r +
@@ -183,11 +183,11 @@ shade_sphere_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
     pointcolor.b = m->color.b;
     pointcolor.a = m->color.a;
 
-    if (Flagged(m->flags, FLAG_TEXTURE)) {
+    if (Flagged(op->flags, FLAG_TEXTURE)) {
 	calc_sphere_texcontrib(&pointcolor, N, op);
     }
 
-    if (!Flagged(m->flags, FLAG_LIGHTING)) {
+    if (!Flagged(op->flags, FLAG_LIGHTING)) {
 	color->r = (u8) Clamp0255(pointcolor.r * MAX_COLOR_VAL);
 	color->g = (u8) Clamp0255(pointcolor.g * MAX_COLOR_VAL);
 	color->b = (u8) Clamp0255(pointcolor.b * MAX_COLOR_VAL);
@@ -318,10 +318,10 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
     pointcolor.b = m->color.b;
     pointcolor.a = m->color.a;
 
-    if (!Flagged(m->flags, FLAG_LIGHTING)) { 
+    if (!Flagged(op->flags, FLAG_LIGHTING)) { 
 
 		/* handle VERTSHADE or POLYSHADE with no lighting */
-	if (Flagged(m->flags, FLAG_VERTSHADE)) {
+	if (Flagged(op->flags, FLAG_VERTSHADE)) {
 
 	    if (vp == (Vtx_t *) NULL || tp == (Tri_t *) NULL) {
 		/* missing data, force material shade */
@@ -340,7 +340,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 			       tsp->v * vp[tp->v1].a +
 			       tsp->w * vp[tp->v2].a;
 	    }
-	} else if (Flagged(m->flags, FLAG_POLYSHADE)) {
+	} else if (Flagged(op->flags, FLAG_POLYSHADE)) {
 
 	    if (tp == (Tri_t *) NULL) {
 		/* missing data, force material shade */
@@ -356,7 +356,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 		/* pointcolor already properly set to material */
         }
 
-        if (Flagged(m->flags, FLAG_TEXTURE)) {
+        if (Flagged(op->flags, FLAG_TEXTURE)) {
 	    calc_tri_texcontrib(&pointcolor, tsp, op);
         }
 
@@ -372,7 +372,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
      */
 
 	/* polygon shading supports a few of the render state flags... */
-    if (!Flagged(m->flags, FLAG_FLATSHADE)) { 
+    if (!Flagged(op->flags, FLAG_FLATSHADE)) { 
 		/* smooth shade, interpolate a normal */
 	if (tsp == (TriShade_t *) NULL) { /* force flatshade, no bary coords */ 
 		/* do nothing */
@@ -392,7 +392,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
         }
     }
 
-    if (Flagged(m->flags, FLAG_VERTSHADE) || Flagged(m->flags, FLAG_RANDSHADE)) {
+    if (Flagged(op->flags, FLAG_VERTSHADE) || Flagged(op->flags, FLAG_RANDSHADE)) {
 		/* both use same mechanism of vertex colors */
 	if (tsp == (TriShade_t *) NULL) { 
 		/* missing data, force material shade */
@@ -419,7 +419,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 	}
     }
 
-    if (Flagged(m->flags, FLAG_POLYSHADE)) {
+    if (Flagged(op->flags, FLAG_POLYSHADE)) {
 	if (tsp == (TriShade_t *) NULL) { 
 		/* missing data, force material shade */
 		/* pointcolor already properly set to material */
@@ -436,7 +436,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 	}
     }
 
-    if (Flagged(m->flags, FLAG_TEXTURE)) {
+    if (Flagged(op->flags, FLAG_TEXTURE)) {
 
 	calc_tri_texcontrib(&pointcolor, tsp, op);
     }

@@ -92,7 +92,7 @@ RPTransformAllVertices(Object_t *op, int count, Vtx_t *verts)
     cat_matrix(op->mmtx, v_mtx, mv);
 
 	/* if we transform normals, we need inverse transpose of MV */
-    if (Flagged(op->material->flags, FLAG_VERTNORM)) {
+    if (Flagged(op->flags, FLAG_VERTNORM)) {
         invert_mtx(mv, mvit); 		/* compute inverse of MV */
 	transpose_mtx(mvit, mvit);	/* compute transpose of MV^-1 */
     }
@@ -154,7 +154,7 @@ RPTransformAllVertices(Object_t *op, int count, Vtx_t *verts)
 	/* project and divide done in vertex_project() */
 
 	/* transform normals */
-	if (Flagged(op->material->flags, FLAG_VERTNORM)) {
+	if (Flagged(op->flags, FLAG_VERTNORM)) {
 
 		/* transform normals: */
 	    outpt.x = (mvit[0][0] * verts[i].n.x + 

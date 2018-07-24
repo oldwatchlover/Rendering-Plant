@@ -89,12 +89,12 @@ trace_primary_ray(Ray_t *ray, ep_t *eplist)
             /* do front/back face culling here */
         cullthis = FALSE;
         if (ray->type == PRIMARY_RAY &&
-            Flagged(op->material->flags, FLAG_CULL_BACK)) {
+            Flagged(op->flags, FLAG_CULL_BACK)) {
             if (Flagged(tp->flags, FLAG_CULL_BACK))
                 cullthis = TRUE;
         }
         if (ray->type == PRIMARY_RAY &&
-            Flagged(op->material->flags, FLAG_CULL_FRONT)) {
+            Flagged(op->flags, FLAG_CULL_FRONT)) {
             if (Flagged(tp->flags, FLAG_CULL_FRONT))
                 cullthis = TRUE;
         }

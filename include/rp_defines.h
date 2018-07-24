@@ -51,6 +51,7 @@
 #define MAX_OBJS        	(1024)
 #define MAX_SPHERES     	(1024)
 #define MAX_TEXTURES    	(32)
+#define MAX_OBJ_MATERIALS    	(32)
 #define MAX_LIGHTS      	(32)
 #define MAX_XRES        	(1920*2)
 #define MAX_YRES        	(1080*2)

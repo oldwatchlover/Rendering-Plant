@@ -120,13 +120,13 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
     }
 
     /* cull backfacing: */
-    if (Flagged(op->material->flags, FLAG_CULL_BACK) && r < 0.0) {
+    if (Flagged(op->flags, FLAG_CULL_BACK) && r < 0.0) {
 	culled_polys++;
 	return;
     }
 
     /* cull frontfacing: */
-    if (Flagged(op->material->flags, FLAG_CULL_FRONT) && r > 0.0) {
+    if (Flagged(op->flags, FLAG_CULL_FRONT) && r > 0.0) {
 	culled_polys++;
 	return;
     }
@@ -142,18 +142,18 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
     polycolor.b = op->material->color.b;
     polycolor.a = op->material->color.a;
 
-    if (Flagged(op->material->flags, FLAG_RANDSHADE)) {
+    if (Flagged(op->flags, FLAG_RANDSHADE)) {
 	/* useful for debugging */
 	polycolor.r = RPRandom();
 	polycolor.g = RPRandom();
 	polycolor.b = RPRandom();
 	polycolor.a = 1.0;
-    } else if (Flagged(op->material->flags, FLAG_POLYSHADE)) {
+    } else if (Flagged(op->flags, FLAG_POLYSHADE)) {
 	polycolor.r = tri->color.r;
 	polycolor.g = tri->color.g;
 	polycolor.b = tri->color.b;
 	polycolor.a = tri->color.a;
-    } else if (Flagged(op->material->flags, FLAG_VERTSHADE)) {
+    } else if (Flagged(op->flags, FLAG_VERTSHADE)) {
 	/* do nothing, rasterizer loop will interp vertex colors */
     }
 
@@ -265,7 +265,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		thispoint.z = p0->sz * thisw;
 	    }
 
-	    if (Flagged(op->material->flags, FLAG_FLATSHADE)) {
+	    if (Flagged(op->flags, FLAG_FLATSHADE)) {
 		thisn.x = tri->normal.x;
 		thisn.y = tri->normal.y;
 		thisn.z = tri->normal.z;
@@ -281,7 +281,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 
 #if 0
 /* get bump contribution: */
-	    if (Flagged(op->material->flags, FLAG_BUMP)) {
+	    if (Flagged(op->flags, FLAG_BUMP)) {
 		tex_samp = RPSampleBumpTexture(0, thisn.x, thisn.y, thisn.z,
 				       thiss, thist, thisw);
 		thiscolor.r = (float)tex_samp.r;
@@ -292,7 +292,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 */
 #endif
 
-	    if (Flagged(op->material->flags, FLAG_VERTSHADE)) {	
+	    if (Flagged(op->flags, FLAG_VERTSHADE)) {	
 		colorsum.r = thiscolor.r;
 		colorsum.g = thiscolor.g;
 		colorsum.b = thiscolor.b;
@@ -304,7 +304,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		colorsum.a = polycolor.a;
 	    }
 
-	    if (Flagged(op->material->flags, FLAG_TEXTURE)) {
+	    if (Flagged(op->flags, FLAG_TEXTURE)) {
 		if (Flagged(op->material->texture->flags, FLAG_TXT_FILT)) {
 		    tex_samp = RPFilterSampleTexture(op->material->texid,
 						   thiss, thist, thisw,
@@ -333,7 +333,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		}
  	    }
 
-	    if (Flagged(op->material->flags, FLAG_REFLECT)) {
+	    if (Flagged(op->flags, FLAG_REFLECT)) {
 		refl.x = 2.0 * thisn.x * (thisn.x * thiseye.x) - thiseye.x;
 		refl.y = 2.0 * thisn.y * (thisn.y * thiseye.y) - thiseye.y;
 		refl.z = 2.0 * thisn.z * (thisn.z * thiseye.z) - thiseye.z;
@@ -345,7 +345,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		colorsum.a = (float)tex_samp.a / MAX_COLOR_VAL;
 	    }
 
-	    if (Flagged(op->material->flags, FLAG_LIGHTING)) {
+	    if (Flagged(op->flags, FLAG_LIGHTING)) {
 		shade_pixel(op, &thisn, &thissurf, &thiseye, &shadeval);
 
 		/* mult colorsum by shade values */

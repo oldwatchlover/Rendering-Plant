@@ -80,9 +80,10 @@ RPAddObject(int type)
 	memcpy(m, cm, sizeof(Material_t));
     }
 
-    m->flags = _RPTempObjRenderFlags;	/* copy current obj_render_flags to material */
+    o->flags = _RPTempObjRenderFlags;	/* copy current obj_render_flags to object */
+    m->flags = 0x0;			/* unused, for now */
 
-    if (Flagged(m->flags, FLAG_TEXTURE)) { /* bind texture */
+    if (Flagged(o->flags, FLAG_TEXTURE)) { /* bind texture */
         m->texid = RPFindTexture(m->texname);
         if (m->texid >= 0) {
 	    curr_texname = m->texname;
@@ -93,7 +94,7 @@ RPAddObject(int type)
 	    fprintf(stderr,"ERROR : %s : %d : could not bind texture [%s] (%d)\n",
 		    __FILE__,__LINE__,m->texname,m->texid);
 	    m->texture = (Texture_t *) NULL;
-	    UnFlag(m->flags, FLAG_TEXTURE);
+	    UnFlag(o->flags, FLAG_TEXTURE);
         }
     } else {	/* clear texture from current material */
 	if (m->texname != (char *) NULL)
@@ -208,14 +209,14 @@ RPProcessObjects(int doProject)
         } else if (op->type == OBJ_TYPE_POLY) {
 
 		/* must do in model space: */
-    	    if (Flagged(op->material->flags, FLAG_TEXGEN_CYLINDER)) {
+    	    if (Flagged(op->flags, FLAG_TEXGEN_CYLINDER)) {
                 op->sphere = create_bounding_sphere(op);	/* need bounding volume */
         	RPGenerateCylindricalTexcoords(op);
 		free(op->sphere);
 		op->sphere = (Sphere_t *) NULL;
     	    }
 
-    	    if (Flagged(op->material->flags, FLAG_TEXGEN_SPHERE)) {
+    	    if (Flagged(op->flags, FLAG_TEXGEN_SPHERE)) {
         	RPGenerateSphericalTexcoords(op);
     	    }
 
@@ -227,8 +228,8 @@ RPProcessObjects(int doProject)
 	 	/* if smooth shaded and no vertex normal, allocate and 
 		 * compute vertex normals 
 		 */
-    	    if (!Flagged(op->material->flags, FLAG_FLATSHADE) &&
-                !Flagged(op->material->flags, FLAG_VERTNORM)) {
+    	    if (!Flagged(op->flags, FLAG_FLATSHADE) &&
+                !Flagged(op->flags, FLAG_VERTNORM)) {
         	    RPCalculateVertexNormals(op, TRUE);
 	    }
 

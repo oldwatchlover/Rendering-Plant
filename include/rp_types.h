@@ -129,12 +129,15 @@ typedef struct {
 typedef struct {
     int         id;
     int         type;
+    u32		flags;
     Sphere_t    *sphere;        /* sphere, or bounding sphere */
     Vtx_t       *verts;
     Tri_t       *tris;
     int         vert_count;
     int         tri_count;
     Material_t  *material;
+    Material_t  *materials[MAX_OBJ_MATERIALS];	/* future use */
+    int         mtl_count;
     float	mmtx[4][4];
 } Object_t;
 

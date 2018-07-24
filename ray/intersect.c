@@ -152,12 +152,12 @@ poly_intersect(Ray_t *ray, Object_t *op, float *t, xyz_t *p, xyz_t *normal)
             /* do front/back face culling here */
             cullthis = FALSE;
             if (ray->type == PRIMARY_RAY &&
-                Flagged(op->material->flags, FLAG_CULL_BACK)) {
+                Flagged(op->flags, FLAG_CULL_BACK)) {
                 if (Flagged(tri->flags, FLAG_CULL_BACK))
                     cullthis = TRUE;
             }
             if (ray->type == PRIMARY_RAY &&
-                Flagged(op->material->flags, FLAG_CULL_FRONT)) {
+                Flagged(op->flags, FLAG_CULL_FRONT)) {
                 if (Flagged(tri->flags, FLAG_CULL_FRONT))
                     cullthis = TRUE;
             }
