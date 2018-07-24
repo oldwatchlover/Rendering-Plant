@@ -226,6 +226,7 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
     
     if (cc_rej != 0) {		/* entirely out of view */
 	RPScene.trivial_rejected_polys++;
+        Flag(tri->flags, FLAG_TRI_CLIPPED);
 	return (CLIP_TRIVIAL_REJECT);
     }
 
@@ -403,6 +404,7 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
 	fprintf(stderr,"%s : ERROR : %s : CLIP : n = %d!\n",
 		program_name,__FILE__,n);
 	RPScene.trivial_rejected_polys++;
+        Flag(tri->flags, FLAG_TRI_CLIPPED);
 	return (CLIP_TRIVIAL_REJECT);
     }
 #endif
