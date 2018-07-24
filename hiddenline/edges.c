@@ -65,9 +65,8 @@ find_edge(int id, int p0, int p1)
     for (i=0; i<ecnt; i++) {
 	if ((ep[i].v0 == p0 && ep[i].v1 == p1) ||
 	    (ep[i].v0 == p1 && ep[i].v1 == p0)) {
-		/* found! */
 
-	    return(i);
+	    return(i);		 /* found! */
 	} 
     }
 
@@ -80,19 +79,18 @@ add_edge(Object_t *op, int id, int thistri, int p0, int p1)
 {
     Vtx_t	*vp;
     Edge_t	*ep;
-    int		i, thisedge;
+    int		thisedge;
 
     ep = (Edge_t *) objEdges[id]->edges;
     vp = (Vtx_t *) op->verts;
 
     thisedge = find_edge(id, p0, p1);
-    i = objEdges[id]->num_edges;
 
     if (thisedge < 0) {		/* add new edge to the list */
 
-	ep[i].tri0 = thistri;
-	ep[i].v0 = p0;
-	ep[i].v1 = p1;
+	ep[objEdges[id]->num_edges].tri0 = thistri;
+	ep[objEdges[id]->num_edges].v0 = p0;
+	ep[objEdges[id]->num_edges].v1 = p1;
 	objEdges[id]->num_edges++;
 
 	total_edges++;
@@ -209,10 +207,8 @@ process_obj_edges(Object_t *op)
 
 	    if (Flagged(op->material->flags, FLAG_CULL_BACK)) {
 		if (Flagged(t0->flags, FLAG_CULL_BACK)) {
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_CULL_BACK);	/* don't draw */
 		} else {
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
 	    fprintf(stderr,"silhouette edge, t0 flags = %08x\n",
@@ -223,7 +219,6 @@ process_obj_edges(Object_t *op)
 
 	    if (Flagged(op->material->flags, FLAG_CULL_FRONT)) {
 		if (Flagged(t0->flags, FLAG_CULL_FRONT)) {
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_CULL_FRONT);	/* don't draw */
 		} else {
 	            UnFlag(ep[i].flags, FLAG_ALL);
@@ -240,7 +235,6 @@ process_obj_edges(Object_t *op)
 
 	        /* detect crease (also handles co-planar triangles sharing edge) */
 	    if (costheta < CREASE_TOLERANCE) {
-	        UnFlag(ep[i].flags, FLAG_ALL);
 	        Flag(ep[i].flags, FLAG_EDGE_CREASE);
 #ifdef DEBUG_EDGES
 	    fprintf(stderr,"edge is a crease, t0 = %08x, t1 = %08x %f\n",
@@ -253,7 +247,6 @@ process_obj_edges(Object_t *op)
 		if (Flagged(t0->flags, FLAG_CULL_BACK) &&
 		    Flagged(t1->flags, FLAG_CULL_BACK)) {
 
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_CULL_BACK);	/* don't draw */
 #ifdef DEBUG_EDGES
 	    fprintf(stderr,"both tris BACKFACING, %08x, %08x\n",
@@ -266,7 +259,6 @@ process_obj_edges(Object_t *op)
 		    (Flagged(t1->flags, FLAG_CULL_BACK) &&
 		    !Flagged(t0->flags, FLAG_CULL_BACK))) {
 
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
 	    fprintf(stderr,"one tri BACKFACING, %08x, %08x one not\n",
@@ -280,7 +272,6 @@ process_obj_edges(Object_t *op)
 		if (Flagged(t0->flags, FLAG_CULL_FRONT) &&
 		    Flagged(t1->flags, FLAG_CULL_FRONT)) {
 
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_CULL_FRONT);	/* don't draw */
 #ifdef DEBUG_EDGES
 	    fprintf(stderr,"both tris BACKFACING, %08x, %08x\n",
@@ -293,7 +284,6 @@ process_obj_edges(Object_t *op)
 		    (Flagged(t1->flags, FLAG_CULL_FRONT) &&
 		    !Flagged(t0->flags, FLAG_CULL_FRONT))) {
 
-	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
 	    fprintf(stderr,"one tri BACKFACING, %08x, %08x one not\n",

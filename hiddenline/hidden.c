@@ -69,7 +69,6 @@ draw_scene(void)
     RPClearDepthFB(NULL);
     RPLoadBackgroundImage();
     RPSetSceneFlags(FLAG_PERSP_TEXTURE); /* tell pipeline to persp correct tex coords */
-    RPClearSceneFlags(FLAG_RENDER_02);
     RPProcessObjects(TRUE); 		/* tranform objects to camera space */
 					/* TRUE flag also does projection */
 
@@ -82,7 +81,7 @@ draw_scene(void)
 	paintshade = TRUE;
     }
 
-    fprintf(stderr,"Progress:  %5.2f %%",progress*50.0);
+    fprintf(stderr,"Progress:  %5.2f %%",progress*33.0);
 
 	/* fill the z-buffer first */
     for (i=0; i<RPScene.obj_count; i++) {
@@ -106,14 +105,13 @@ draw_scene(void)
 		    paint_tri(op, tri, paintshade);
             }
 
-
     	} else {     /* can't happen */
             fprintf(stderr,"ERROR : %s : %d : unknown object type %d\n",
                         __FILE__,__LINE__,op->type);
         }
 
         progress = (float)i/(float)RPScene.obj_count;
-        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*50.0);
+        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*33.0);
     }
 
 	/* process edges */
@@ -130,6 +128,9 @@ draw_scene(void)
 	    create_obj_edges(op);
 	    process_obj_edges(op);
         }
+
+        progress = (float)i/(float)RPScene.obj_count;
+        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*33.0+33.0);
     }
 
 	/* paint edges */
@@ -147,7 +148,7 @@ draw_scene(void)
 	}
 
         progress = (float)i/(float)RPScene.obj_count;
-        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",(progress*50.0)+50.0);
+        fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",(progress*33.0)+66.0);
     }
 
     fprintf(stderr,"\b\b\b\b\b\b\b\b100 %% ... done!\n");
