@@ -49,7 +49,10 @@
  */
 
 /* current material */
-static Material_t      *CurrentMaterial = (Material_t *) NULL;
+static Material_t       *CurrentMaterial = (Material_t *) NULL;
+#if 0
+static Material_t	*CurrentMaterialArray[MAX_OBJ_MATERIALS];
+#endif
 
 /* create a new, default material: */
 static Material_t *
@@ -87,8 +90,6 @@ void
 RPFreeCurrentMaterial(void)
 {
     if (CurrentMaterial != (Material_t *)NULL) {
-	if (CurrentMaterial->texname != (char *) NULL)
-	    free (CurrentMaterial->texname);
 	free (CurrentMaterial);
 	CurrentMaterial = (Material_t *) NULL;
     }
@@ -207,15 +208,32 @@ RPSetMaterialRefraction(float value)
 }
 
 void
-RPSetMaterialTexture(char *name)
+RPSetMaterialTexture(char *name, int channel)
 {
+    int		texnum;
+
     if (CurrentMaterial == (Material_t *)NULL) {
 	CurrentMaterial = NewMaterial();
     }
 
     Material_t *m = CurrentMaterial;
 
-    m->texname = (char *) malloc(strlen(name)+1);
-    strcpy(m->texname, name);
+    if ((channel < MATERIAL_COLOR) || (channel > MATERIAL_CHANNELS)) {
+	channel = MATERIAL_COLOR;
+    } 
+
+    if (name == (char *) NULL) {	/* clear texture from material */
+        m->texture[channel] = (Texture_t *) NULL;
+    }
+
+    texnum = RPFindTexture(name);
+
+    if (texnum < 0) {
+        fprintf(stderr,"ERROR : %s : %d : could not bind texture [%s] (%d)\n",
+                __FILE__,__LINE__,name,texnum);
+        m->texture[channel] = (Texture_t *) NULL;
+    } else {
+	m->texture[channel] = RPScene.texture_list[texnum];
+    }
 }
 

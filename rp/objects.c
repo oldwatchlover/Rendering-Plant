@@ -42,7 +42,6 @@
 u32	_RPTempObjRenderFlags = 0x0;
 
 static Material_t default_material = {
-    0x0,			/* render flags */
     {1.0, 1.0, 1.0, 1.0},	/* color */
     {0.2, 0.2, 0.2, 1.0},	/* amb */
     {1.0, 1.0, 1.0, 1.0},	/* diff */
@@ -50,7 +49,7 @@ static Material_t default_material = {
     {1.0, 1.0, 1.0, 1.0},	/* highlight color */
     50.0,			/* shiny */
     0.0, 0.0,			/* Krefl, Krefr */
-    0x0, 0, 0x0,		/* texname, texid, *texture */
+    {0x0, 0x0, 0x0, 0x0},	/* *texture[] */
 };
 
 static Sphere_t * create_bounding_sphere(Object_t *);
@@ -67,7 +66,6 @@ RPAddObject(int type)
 {
     Object_t	*o;
     Material_t	*m, *cm;
-    char 	*curr_texname;
     
 
     o = (Object_t *) calloc(1, sizeof(Object_t));
@@ -81,26 +79,12 @@ RPAddObject(int type)
     }
 
     o->flags = _RPTempObjRenderFlags;	/* copy current obj_render_flags to object */
-    m->flags = 0x0;			/* unused, for now */
 
-    if (Flagged(o->flags, FLAG_TEXTURE)) { /* bind texture */
-        m->texid = RPFindTexture(m->texname);
-        if (m->texid >= 0) {
-	    curr_texname = m->texname;
-	    m->texname = (char *) malloc(strlen(curr_texname)+1);
-	    strcpy(m->texname, curr_texname);
-	    m->texture = RPScene.texture_list[m->texid];
-        } else {
-	    fprintf(stderr,"ERROR : %s : %d : could not bind texture [%s] (%d)\n",
-		    __FILE__,__LINE__,m->texname,m->texid);
-	    m->texture = (Texture_t *) NULL;
-	    UnFlag(o->flags, FLAG_TEXTURE);
-        }
-    } else {	/* clear texture from current material */
-	if (m->texname != (char *) NULL)
-	    m->texname[0] = '\0';
-	m->texid = -1;
-	m->texture = (Texture_t *) NULL;
+    if (!Flagged(o->flags, FLAG_TEXTURE)) {
+	m->texture[MATERIAL_COLOR] = (Texture_t *) NULL;
+	m->texture[MATERIAL_AMBIENT] = (Texture_t *) NULL;
+	m->texture[MATERIAL_DIFFUSE] = (Texture_t *) NULL;
+	m->texture[MATERIAL_SPECULAR] = (Texture_t *) NULL;
     }
 
         /* store current top of model matrix stack with object for later xform */
@@ -110,6 +94,7 @@ RPAddObject(int type)
     o->type = type;
     o->id = RPScene.obj_count;
     o->material = m;
+    o->mtl_count = 1;
 
     RPScene.obj_list[RPScene.obj_count++] = o;
 

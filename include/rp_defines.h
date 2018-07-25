@@ -107,7 +107,7 @@
 #define FLAG_SCENE_MULTISAMPLE	0x00000040
 #define FLAG_PERSP_TEXTURE	0x00000080
  
-/* some triangle flags (clipping): */
+/* triangle flags (clipping): */
 #define FLAG_TRI_CLIPPED        0x0010
 #define FLAG_TRI_CLIP_GEN       0x0020
 #define CLIP_TRIVIAL_REJECT     (0)
@@ -127,6 +127,13 @@
 #define FLAG_VERTNORM   	0x00000400
 #define FLAG_TEXGEN_SPHERE   	0x00000800
 #define FLAG_TEXGEN_CYLINDER   	0x00001000
+
+/* for materials: */
+#define MATERIAL_COLOR		(0)
+#define MATERIAL_AMBIENT	(1)
+#define MATERIAL_DIFFUSE	(2)
+#define MATERIAL_SPECULAR	(3)
+#define MATERIAL_CHANNELS	(4)
 
 /* texture flags: */
 #define FLAG_TXT_CLAMP  	0x00000001

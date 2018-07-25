@@ -98,7 +98,6 @@ typedef struct {
 /* internal texture structure: */
 typedef struct {
     char        *filename;
-    char        inuse;
     u32         flags;
     int         xres, yres;
     float       sscale, tscale;
@@ -108,9 +107,7 @@ typedef struct {
 
 /* materials belong to objects, get passed to shader */
 typedef struct {
-    u32		flags;
     Colorf_t    color;
-	/* add emission? */
     Colorf_t	amb;
     Colorf_t	diff;
     Colorf_t	spec;
@@ -120,9 +117,7 @@ typedef struct {
     float       Krefl;
     float       Krefr;
 	/* should add multiple textures, reflection and bump maps here... */
-    char	*texname;
-    int		texid;
-    Texture_t	*texture;
+    Texture_t	*texture[MATERIAL_CHANNELS];
 } Material_t;
 
 /* high level object structure */

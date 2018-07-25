@@ -580,7 +580,43 @@ command:
 	    texname = $5;
 
 	    expandstring(texname);
-	    RPSetMaterialTexture(texname);
+	    RPSetMaterialTexture(texname, MATERIAL_COLOR);
+	}
+	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA COLOR CL_PAREN SEMICOLON
+        {
+	    char	*texname;
+
+	    texname = $5;
+
+	    expandstring(texname);
+	    RPSetMaterialTexture(texname, MATERIAL_COLOR);
+	}
+	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA AMBIENT CL_PAREN SEMICOLON
+        {
+	    char	*texname;
+
+	    texname = $5;
+
+	    expandstring(texname);
+	    RPSetMaterialTexture(texname, MATERIAL_AMBIENT);
+	}
+	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA DIFFUSE CL_PAREN SEMICOLON
+        {
+	    char	*texname;
+
+	    texname = $5;
+
+	    expandstring(texname);
+	    RPSetMaterialTexture(texname, MATERIAL_DIFFUSE);
+	}
+	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA SPECULAR CL_PAREN SEMICOLON
+        {
+	    char	*texname;
+
+	    texname = $5;
+
+	    expandstring(texname);
+	    RPSetMaterialTexture(texname, MATERIAL_SPECULAR);
 	}
         |   FOG_CMD OP_PAREN fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{

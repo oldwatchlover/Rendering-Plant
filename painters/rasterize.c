@@ -102,7 +102,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
     float	Hdt, Mdt, DxDt, DyDt, thist;
     float	Hdw, Mdw, DxDw, DyDw, thisw;
     float	Hdz, Mdz, DxDz, DyDz, thisz;
-    xyz_t	refl, thispoint;
+    xyz_t	thispoint;
     xyz_t	Hdsurf, Mdsurf, DxDsurf, DyDsurf, thissurf;
     xyz_t	Hdnorm, Mdnorm, DxDnorm, DyDnorm, thisn;
     xyz_t	Hdeye, Mdeye, DxDeye, DyDeye, thiseye;
@@ -279,19 +279,6 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 	    thiseye.y = p0->e.y + (x - p0->sx)*DxDeye.y + (y - p0->sy)*DyDeye.y;
 	    thiseye.z = p0->e.z + (x - p0->sx)*DxDeye.z + (y - p0->sy)*DyDeye.z;
 
-#if 0
-/* get bump contribution: */
-	    if (Flagged(op->flags, FLAG_BUMP)) {
-		tex_samp = RPSampleBumpTexture(0, thisn.x, thisn.y, thisn.z,
-				       thiss, thist, thisw);
-		thiscolor.r = (float)tex_samp.r;
-		thiscolor.g = (float)tex_samp.g;
-		thiscolor.b = (float)tex_samp.b;
-		thiscolor.a = (float)tex_samp.a;
-	    }
-*/
-#endif
-
 	    if (Flagged(op->flags, FLAG_VERTSHADE)) {	
 		colorsum.r = thiscolor.r;
 		colorsum.g = thiscolor.g;
@@ -304,14 +291,14 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		colorsum.a = polycolor.a;
 	    }
 
-	    if (Flagged(op->flags, FLAG_TEXTURE)) {
-		if (Flagged(op->material->texture->flags, FLAG_TXT_FILT)) {
-		    tex_samp = RPFilterSampleTexture(op->material->texid,
+	    if (op->material->texture[MATERIAL_COLOR] != (Texture_t *) NULL) {
+		if (Flagged(op->material->texture[MATERIAL_COLOR]->flags, FLAG_TXT_FILT)) {
+		    tex_samp = RPFilterSampleTexture(op->material->texture[MATERIAL_COLOR],
 						   thiss, thist, thisw,
 						   DxDs, DyDs, DxDt, DyDt,
 						   DxDw, DyDw);
 		} else {
-		    tex_samp = RPPointSampleTexture(op->material->texid,
+		    tex_samp = RPPointSampleTexture(op->material->texture[MATERIAL_COLOR],
 						    thiss, thist, thisw);
 		}
 
@@ -320,7 +307,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		texcolor.b = (float)tex_samp.b / MAX_COLOR_VAL;
 		texcolor.a = (float)tex_samp.a / MAX_COLOR_VAL;
 
-		if (Flagged(op->material->texture->flags, FLAG_TXT_MODULATE)) {
+		if (Flagged(op->material->texture[MATERIAL_COLOR]->flags, FLAG_TXT_MODULATE)) {
 		    colorsum.r *= texcolor.r;
 		    colorsum.g *= texcolor.g;
 		    colorsum.b *= texcolor.b;
@@ -332,18 +319,6 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		    colorsum.a = texcolor.a;
 		}
  	    }
-
-	    if (Flagged(op->flags, FLAG_REFLECT)) {
-		refl.x = 2.0 * thisn.x * (thisn.x * thiseye.x) - thiseye.x;
-		refl.y = 2.0 * thisn.y * (thisn.y * thiseye.y) - thiseye.y;
-		refl.z = 2.0 * thisn.z * (thisn.z * thiseye.z) - thiseye.z;
-		tex_samp = RPSampleReflectionTexture(&refl);
-			/* replace pixel color with reflect color */
-		colorsum.r = (float)tex_samp.r / MAX_COLOR_VAL; 
-		colorsum.g = (float)tex_samp.g / MAX_COLOR_VAL;
-		colorsum.b = (float)tex_samp.b / MAX_COLOR_VAL;
-		colorsum.a = (float)tex_samp.a / MAX_COLOR_VAL;
-	    }
 
 	    if (Flagged(op->flags, FLAG_LIGHTING)) {
 		shade_pixel(op, &thisn, &thissurf, &thiseye, &shadeval);

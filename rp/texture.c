@@ -91,7 +91,6 @@ texture_bmp_load(int texnum, char *filename, u32 flags, float sscale, float tsca
 
     tex->filename = (char *) malloc(strlen(filename)+1);
     strcpy(tex->filename, filename);
-    tex->inuse = TRUE;
     tex->flags = flags;
     tex->sscale = sscale;
     tex->tscale = tscale;
@@ -171,7 +170,6 @@ RPFreeTexture(int texnum)
 	free (tp->tmem);
     }
 
-    tp->inuse = FALSE;
     tp->flags = 0x0;
     tp->xres = tp->yres = 0;
     tp->sscale = tp->tscale = 0.0;
@@ -284,29 +282,15 @@ texel_address(Texture_t *tex, float s, float t, float inv_w, int *x, int *y)
 
 /* sample a texture */
 rgba_t
-RPPointSampleTexture(int texnum, float s, float t, float inv_w)
+RPPointSampleTexture(Texture_t *tex, float s, float t, float inv_w)
 {
-    Texture_t	*tex;
     rgba_t	samp, black = {0, 0, 0, MAX_COLOR_VAL};
     int		x, y;
 
 
-    if (texnum < 0) {
-	fprintf(stderr,"%s : ERROR : %s : %d : trying to sample texture (%d)\n",
-		program_name, __FILE__,__LINE__,texnum);
-	return(black);
-    }
-
-    tex = RPScene.texture_list[texnum];
     if (tex == (Texture_t *) NULL) {
-	fprintf(stderr,"%s : ERROR : %s : %d : NULL texture (%d) in sample func\n",
-		program_name, __FILE__,__LINE__,texnum);
-	return(black);
-    }
-
-    if (!tex->inuse) {	/* texture not loaded */
-	fprintf(stderr,"%s : ERROR : %s : %d : texture (%d) not loaded in sample func\n",
-		program_name, __FILE__,__LINE__,texnum);
+	fprintf(stderr,"%s : ERROR : %s : %d : NULL texture in sample func\n",
+		program_name, __FILE__,__LINE__);
 	return(black);
     }
 
@@ -327,26 +311,26 @@ RPPointSampleTexture(int texnum, float s, float t, float inv_w)
  *
  */
 rgba_t
-RPFilterSampleTexture(int texnum, float s, float t, float inv_w,
+RPFilterSampleTexture(Texture_t *tex, float s, float t, float inv_w,
  		      float DxDs, float DyDs, float DxDt, float DyDt,
 		      float DxDw, float DyDw)
 {
     rgba_t	samp, tx0, tx1, tx2, tx3;
 
 
-    tx0 = RPPointSampleTexture(texnum, 
+    tx0 = RPPointSampleTexture(tex, 
 			       s-(DxDs*0.5)-(DyDs*0.5), 
 			       t-(DxDt*0.5)-(DyDt*0.5), 
 			       inv_w-(DxDw*0.5)-(DyDw*0.5));
-    tx1 = RPPointSampleTexture(texnum, 
+    tx1 = RPPointSampleTexture(tex, 
 			       s+(DxDs*0.5)-(DyDs*0.5), 
 			       t+(DxDt*0.5)-(DyDt*0.5), 
 			       inv_w+(DxDw*0.5)-(DyDw*0.5));
-    tx2 = RPPointSampleTexture(texnum, 
+    tx2 = RPPointSampleTexture(tex, 
 			       s+(DxDs*0.5)+(DyDs*0.5), 
 			       t+(DxDt*0.5)+(DyDt*0.5), 
 			       inv_w+(DxDw*0.5)+(DyDw*0.5));
-    tx3 = RPPointSampleTexture(texnum, 
+    tx3 = RPPointSampleTexture(tex, 
 			       s-(DxDs*0.5)+(DyDs*0.5), 
 			       t-(DxDt*0.5)+(DyDt*0.5), 
 			       inv_w-(DxDw*0.5)+(DyDw*0.5));
@@ -359,6 +343,7 @@ RPFilterSampleTexture(int texnum, float s, float t, float inv_w,
     return(samp);
 }
 
+#if 0
 /* sample a reflection texture */
 rgba_t
 RPSampleReflectionTexture(xyz_t *r)
@@ -412,9 +397,6 @@ RPSampleBumpTexture(int texnum, float nx, float ny, float nz, float s, float t, 
     if (tex == (Texture_t *) NULL) 	/* texture not loaded */
 	return(black);
 
-    if (!tex->inuse) 			/* texture not loaded */
-	return(black);
-
     texel_address(tex, s, t, inv_w, &x, &y);
 
     /* avoid edge cases (for now) */
@@ -451,6 +433,7 @@ RPSampleBumpTexture(int texnum, float nx, float ny, float nz, float s, float t, 
 */
     return (black);
 }
+#endif
 
 
 /* 

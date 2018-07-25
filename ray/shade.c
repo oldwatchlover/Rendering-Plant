@@ -93,15 +93,18 @@ calc_N_L_H(float *NdotL, float *NdotH, xyz_t *N,
 static void
 calc_sphere_texcontrib(Colorf_t *pointcolor, xyz_t *N, Object_t *op)
 {
+    Texture_t	*tex;
     rgba_t	tex_samp;
     float	s, t;
 
     s = 0.5 + (atan2f(N->z, -N->x) / (2.0*Pi));
     t = 0.5 + (asinf(-N->y) / Pi);
 
-    tex_samp = RPPointSampleTexture(op->material->texid, s, t, 1.0);
+    tex = op->material->texture[MATERIAL_COLOR];
 
-    if (Flagged(RPGetTextureFlags(op->material->texid), FLAG_TXT_MODULATE)) {
+    tex_samp = RPPointSampleTexture(tex, s, t, 1.0);
+
+    if (Flagged(tex->flags, FLAG_TXT_MODULATE)) {
 
 	    pointcolor->r *= (float)tex_samp.r * one255;
 	    pointcolor->g *= (float)tex_samp.g * one255;
@@ -120,6 +123,7 @@ calc_sphere_texcontrib(Colorf_t *pointcolor, xyz_t *N, Object_t *op)
 static void
 calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op)
 {
+    Texture_t	*tex;
     Vtx_t	*vp = tsp->op->verts;
     Tri_t	*tp = tsp->tri;
     rgba_t	tex_samp;
@@ -134,9 +138,11 @@ calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op)
         s = tsp->u * vp[tp->v0].s + tsp->v * vp[tp->v1].s + tsp->w * vp[tp->v2].s;
         t = tsp->u * vp[tp->v0].t + tsp->v * vp[tp->v1].t + tsp->w * vp[tp->v2].t;
 
-        tex_samp = RPPointSampleTexture(op->material->texid, s, t, 1.0);
+        tex = op->material->texture[MATERIAL_COLOR];
 
-        if (Flagged(RPGetTextureFlags(op->material->texid), FLAG_TXT_MODULATE) &&
+        tex_samp = RPPointSampleTexture(tex, s, t, 1.0);
+
+        if (Flagged(tex->flags, FLAG_TXT_MODULATE) &&
 	    Flagged(op->flags, FLAG_VERTSHADE)) {
 			/* use barycentric coords to calc interp vertex colors */
     	    pointcolor->r = tsp->u * vp[tp->v0].r +
@@ -183,7 +189,7 @@ shade_sphere_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
     pointcolor.b = m->color.b;
     pointcolor.a = m->color.a;
 
-    if (Flagged(op->flags, FLAG_TEXTURE)) {
+    if (m->texture[MATERIAL_COLOR] != NULL) {
 	calc_sphere_texcontrib(&pointcolor, N, op);
     }
 
@@ -356,7 +362,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 		/* pointcolor already properly set to material */
         }
 
-        if (Flagged(op->flags, FLAG_TEXTURE)) {
+        if (m->texture[MATERIAL_COLOR] != NULL) {
 	    calc_tri_texcontrib(&pointcolor, tsp, op);
         }
 
@@ -436,8 +442,7 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 	}
     }
 
-    if (Flagged(op->flags, FLAG_TEXTURE)) {
-
+    if (m->texture[MATERIAL_COLOR] != NULL) {
 	calc_tri_texcontrib(&pointcolor, tsp, op);
     }
 

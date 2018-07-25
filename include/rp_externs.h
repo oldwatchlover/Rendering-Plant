@@ -111,7 +111,7 @@ extern void		RPSetMaterialHighlight(Colorf_t color);
 extern void		RPSetMaterialShiny(float value);
 extern void		RPSetMaterialReflection(float value);
 extern void		RPSetMaterialRefraction(float value);
-extern void		RPSetMaterialTexture(char *name);
+extern void		RPSetMaterialTexture(char *name, int channel);
 
 /* from light.c */
 extern void     	RPSetLight(xyz_t pos, Colorf_t color);
@@ -160,15 +160,12 @@ extern void	  	RPFreeTexture(int texnum);
 extern void	  	RPCleanupTextures(void);
 extern u32        	RPGetTextureFlags(int texnum);
 extern int	  	RPFindTexture(char *name);
-extern rgba_t     	RPPointSampleTexture(int texnum, 
+extern rgba_t     	RPPointSampleTexture(Texture_t *tex, 
 				float s, float t, float inv_w);
-extern rgba_t     	RPFilterSampleTexture(int texnum, 
+extern rgba_t     	RPFilterSampleTexture(Texture_t *tex, 
 				float s, float t, float inv_w,
 				float DxDs, float DyDs, float DxDt, float DyDt,
 				float DxDw, float DyDw);
-extern rgba_t     	RPSampleReflectionTexture(xyz_t *r);
-extern rgba_t	  	RPSampleBumpTexture(int texnum, float nx, float ny, float nz, 
-				float s, float t, float inv_w);
 extern void		RPGenerateSphericalTexcoords(Object_t *op);
 extern void		RPGenerateCylindricalTexcoords(Object_t *op);
 
