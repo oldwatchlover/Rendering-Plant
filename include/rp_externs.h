@@ -103,6 +103,7 @@ extern void     	RPClearGenericSceneFlags(u32 flags);
 /* from material.c */
 extern void		RPFreeCurrentMaterial(void);
 extern Material_t     	*RPGetCurrentMaterial(void);
+extern void		RPSetMaterialName(char *name);
 extern void		RPSetMaterialColor(Colorf_t color);
 extern void		RPSetMaterialAmbient(Colorf_t color);
 extern void		RPSetMaterialDiffuse(Colorf_t color);
@@ -114,6 +115,7 @@ extern void		RPSetMaterialRefraction(float value);
 extern void		RPSetMaterialTexture(char *name, int channel);
 
 /* from light.c */
+extern void     	RPSetAmbient(Colorf_t color);
 extern void     	RPSetLight(xyz_t pos, Colorf_t color);
 extern void     	RPSetSpotLight(xyz_t pos, xyz_t coi, float fov, float focus, 
 				float range, float value, Colorf_t color);

@@ -52,6 +52,7 @@
 static Material_t       *CurrentMaterial = (Material_t *) NULL;
 #if 0
 static Material_t	*CurrentMaterialArray[MAX_OBJ_MATERIALS];
+static int		CurrentMaterialCount = 0;
 #endif
 
 /* create a new, default material: */
@@ -90,9 +91,33 @@ void
 RPFreeCurrentMaterial(void)
 {
     if (CurrentMaterial != (Material_t *)NULL) {
+	if (CurrentMaterial->name != (char *) NULL) {
+	    free (CurrentMaterial->name);
+	}
+
 	free (CurrentMaterial);
 	CurrentMaterial = (Material_t *) NULL;
     }
+}
+
+/* set current material name */
+void
+RPSetMaterialName(char *name)
+{
+    if (name == NULL) {
+	return;
+    }
+
+    if (CurrentMaterial == (Material_t *)NULL) {
+	CurrentMaterial = NewMaterial();
+    }
+
+    Material_t *m = CurrentMaterial;
+
+	/* close curr material and increment? */
+
+    m->name = (char *) malloc(strlen(name)+1);
+    strcpy(m->name, name);
 }
 
 /* all parameters are in the range 0-1.0 */

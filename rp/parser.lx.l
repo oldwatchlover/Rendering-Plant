@@ -342,6 +342,11 @@ extern int  _RPmylineno;
 			    yylval.integer = TEXNAME;
 			    RET(TEXNAME); 
                         }
+"name"                  {
+                            strcat(_RPline_buffer, yytext);
+			    yylval.integer = NAME;
+			    RET(NAME); 
+                        }
 "fog"                   {
                             strcat(_RPline_buffer, yytext);
 			    yylval.integer = FOG_CMD;

@@ -40,6 +40,19 @@
 #include "rp.h"
 
 
+/* set ambient light (called from parser) */
+void
+RPSetAmbient(Colorf_t color)
+{
+    RPScene.ambient.r = color.r;
+    RPScene.ambient.g = color.g;
+    RPScene.ambient.b = color.b;
+    RPScene.ambient.a = color.a;
+
+fprintf(stderr,"set scene ambient: %f %f %f\n",
+	RPScene.ambient.r, RPScene.ambient.g, RPScene.ambient.b);
+}
+
 /* set light (called from parser) */
 void
 RPSetLight(xyz_t pos, Colorf_t color)

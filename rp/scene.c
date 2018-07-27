@@ -101,6 +101,10 @@ RPInitScene(void)
     RPScene.obj_count = 0;
 	/* light_list is empty */
     RPScene.light_count = 0;
+    RPScene.ambient.r = 0.0;
+    RPScene.ambient.g = 0.0;
+    RPScene.ambient.b = 0.0;
+    RPScene.ambient.a = 0.0;
     RPScene.xres = MAX_XRES/2;
     RPScene.yres = MAX_YRES/2;
     RPScene.num_samples = 1;
@@ -110,7 +114,6 @@ RPInitScene(void)
     RPScene.fog_color.b = 0.0; RPScene.fog_color.a = 0.0;
     RPScene.fog_start = REALLY_BIG_FLOAT;
     RPScene.fog_end = 0.0;
-    RPScene.ambient = 0.0;
     RPScene.output_file = (char *) malloc(strlen(DEFAULT_OUTPUT_FILE)+1);
     strcpy(RPScene.output_file, DEFAULT_OUTPUT_FILE);
     RPScene.background_file = (char *) NULL;

@@ -42,6 +42,7 @@
 u32	_RPTempObjRenderFlags = 0x0;
 
 static Material_t default_material = {
+    0x0,    			/* name */
     {1.0, 1.0, 1.0, 1.0},	/* color */
     {0.2, 0.2, 0.2, 1.0},	/* amb */
     {1.0, 1.0, 1.0, 1.0},	/* diff */

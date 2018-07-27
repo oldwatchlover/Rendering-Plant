@@ -124,6 +124,7 @@ int 	yylex(void); /* added this to quiet warnings with bison -y */
 %token	<integer>	REFLECTION
 %token	<integer>	REFRACTION
 %token	<integer>	TEXNAME
+%token	<integer>	NAME
 %token	<integer>	FOG_CMD
 %token	<integer>	CLEAR_BACK
 %token	<integer>	BACKGROUND
@@ -455,6 +456,17 @@ command:
 
             RPSetScissor(tulx, tuly, tlrx, tlry);
         }
+	| AMBIENT OP_PAREN fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
+	{
+	    Colorf_t	col;
+
+	    col.r = $3;
+	    col.g = $5;
+	    col.b = $7;
+	    col.a = 1.0;
+	
+	    RPSetAmbient(col);
+        }
         |   LIGHT OP_PAREN fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{
             xyz_t	pos;
@@ -494,6 +506,14 @@ command:
 	    RPSetSpotLight(pos, coi, fov, focus, range, 1.0, col);
 	}
 	/* material() commands have a keyword, with the attribute they set */
+	| MATERIAL OP_PAREN NAME COMMA QSTRING CL_PAREN SEMICOLON
+        {
+	    char	*name;
+
+	    name = $5;
+
+	    RPSetMaterialName(name);
+	}
 	| MATERIAL OP_PAREN COLOR COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
         {
 	    Colorf_t	color;

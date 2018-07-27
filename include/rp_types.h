@@ -107,6 +107,7 @@ typedef struct {
 
 /* materials belong to objects, get passed to shader */
 typedef struct {
+    char	*name;
     Colorf_t    color;
     Colorf_t	amb;
     Colorf_t	diff;
@@ -181,6 +182,7 @@ typedef struct {
     int		obj_count;
     Light_t	*light_list[MAX_LIGHTS];
     int		light_count;
+    Colorf_t	ambient;
     Texture_t	*texture_list[MAX_TEXTURES+1];
     int		texture_count;
     int		xres, yres;
@@ -188,7 +190,6 @@ typedef struct {
     rgba_t	background_color;
     Colorf_t	fog_color;
     float	fog_start, fog_end;
-    float	ambient;
     char	*output_file;
     char	*background_file;
     int		input_polys;
