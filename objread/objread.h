@@ -47,6 +47,7 @@ typedef struct
     int		t0, t1, t2;
     int		n0, n1, n2;
     xyz_t	normal;
+    int		material_id;
 } tri_t;
 
 typedef struct
@@ -89,6 +90,7 @@ typedef struct
 
 /* program external variables: */
 
+extern int	_RPObjRead_current_material;
 
 /* program external functions: */
 

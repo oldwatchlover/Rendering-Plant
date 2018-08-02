@@ -75,6 +75,8 @@ add_tri(int v0, int v1, int v2,
     tp->normal.y = 0.0;
     tp->normal.z = 0.0;
 
+    tp->material_id = _RPObjRead_current_material;
+
     input_tri_count++;
 
 	/* update tex coord for the vertices: */

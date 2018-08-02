@@ -147,6 +147,8 @@ read_obj_from_file(char *filename, Object_t *op)
 	tp->v1 = itp->v1;
 	tp->v2 = itp->v2;
 
+ 	tp->material_id = itp->material_id;
+
 	tp++;
 	itp++;
     }

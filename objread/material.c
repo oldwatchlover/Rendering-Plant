@@ -37,7 +37,11 @@
 #include <string.h>
 #include <math.h>
 
+#include "rp.h"
+
 #include "objread.h"
+
+int	_RPObjRead_current_material = 0;
 
 void
 add_mtllib(int n, char *names[])
@@ -56,6 +60,17 @@ add_mtllib(int n, char *names[])
 void
 add_usemtl(char *name)
 {
+    int		index;
+
     debug_printf(stderr,"set usemtl : \t[%s]\n",name);
+
+    index = RPFindMaterial(name);
+
+    if (index >= 0) {
+	_RPObjRead_current_material = index;
+    } else {
+	fprintf(stderr,"%s : WARNING : could not find material [%s]\n",
+		program_name, name);
+    }   
 }
 
