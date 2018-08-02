@@ -49,15 +49,11 @@
  */
 
 /* current material */
-static Material_t       *CurrentMaterial = (Material_t *) NULL;
-#if 0
-static Material_t	*CurrentMaterialArray[MAX_OBJ_MATERIALS];
-static int		CurrentMaterialCount = 0;
-#endif
+static int	CurrentMaterialIndex = 0;
 
-/* create a new, default material: */
-static Material_t *
-NewMaterial(void)
+/* create a new material structure: */
+Material_t *
+RPNewMaterial(void)
 {
     Material_t	*m;
 
@@ -79,57 +75,102 @@ NewMaterial(void)
     return(m);
 }
 
-/* return the current material (the one the input parser is modifying) */
-Material_t *
-RPGetCurrentMaterial(void)
-{
-    return (CurrentMaterial);
-}
-
 /* free the current material */
 void
-RPFreeCurrentMaterial(void)
+RPFreeMaterial(int index)
 {
-    if (CurrentMaterial != (Material_t *)NULL) {
-	if (CurrentMaterial->name != (char *) NULL) {
-	    free (CurrentMaterial->name);
+    if (RPScene.material_list[index] != (Material_t *)NULL) {
+	if (RPScene.material_list[index]->name != (char *) NULL) {
+	    free (RPScene.material_list[index]->name);
 	}
 
-	free (CurrentMaterial);
-	CurrentMaterial = (Material_t *) NULL;
+	free (RPScene.material_list[index]);
+	RPScene.material_list[index] = (Material_t *) NULL;
     }
+}
+
+void
+RPCleanupMaterials(void)
+{
+    int         i;
+
+    for (i=0; i<RPScene.material_count; i++) {
+
+        RPFreeMaterial(i);
+    }
+
+    RPScene.material_count = 0;
+}
+
+int
+RPFindMaterial(char *name)
+{
+    Material_t   *m;
+    int         i, index = -1;
+
+    if (name == (char *) NULL)
+        return (index);
+
+    for (i=0; i<RPScene.material_count && index<0; i++) {
+        m = RPScene.material_list[i];
+
+        if (m != (Material_t *) NULL) {
+            if (m->name != (char *) NULL) {
+                if (strcmp(m->name, name) == 0) {
+                    index = i;
+                }
+            }
+        }
+    }
+
+    return (index);
 }
 
 /* set current material name */
 void
 RPSetMaterialName(char *name)
 {
+    int		index;
+
     if (name == NULL) {
 	return;
     }
 
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    index = RPFindMaterial(name);
+
+    if (index < 0) {
+	index = RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
+    if (index >= MAX_MATERIALS) {
+	fprintf(stderr,"%s : ERROR : too many materials! (%d)\n",
+		program_name, index);
+	index = 0;
+    }
 
-	/* close curr material and increment? */
+    if (RPScene.material_list[index] == (Material_t *) NULL) {
+	RPScene.material_list[index] = RPNewMaterial();
+	CurrentMaterialIndex++;
+    }
 
-    m->name = (char *) malloc(strlen(name)+1);
-    strcpy(m->name, name);
+    RPScene.material_list[index]->name = (char *) malloc(strlen(name)+1);
+    strcpy(RPScene.material_list[index]->name, name);
+
+    CurrentMaterialIndex = index;
 }
 
 /* all parameters are in the range 0-1.0 */
 void
 RPSetMaterialColor(Colorf_t color)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t	*m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->color.r = color.r;
     m->color.g = color.g;
     m->color.b = color.b;
@@ -139,12 +180,14 @@ RPSetMaterialColor(Colorf_t color)
 void
 RPSetMaterialAmbient(Colorf_t color)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->amb.r = color.r;
     m->amb.g = color.g;
     m->amb.b = color.b;
@@ -154,12 +197,14 @@ RPSetMaterialAmbient(Colorf_t color)
 void
 RPSetMaterialDiffuse(Colorf_t color)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->diff.r = color.r;
     m->diff.g = color.g;
     m->diff.b = color.b;
@@ -169,12 +214,14 @@ RPSetMaterialDiffuse(Colorf_t color)
 void
 RPSetMaterialSpecular(Colorf_t color)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->spec.r = color.r;
     m->spec.g = color.g;
     m->spec.b = color.b;
@@ -184,12 +231,14 @@ RPSetMaterialSpecular(Colorf_t color)
 void
 RPSetMaterialHighlight(Colorf_t color)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->highlight.r = color.r;
     m->highlight.g = color.g;
     m->highlight.b = color.b;
@@ -199,36 +248,42 @@ RPSetMaterialHighlight(Colorf_t color)
 void
 RPSetMaterialShiny(float value)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->shiny = value;
 }
 
 void
 RPSetMaterialReflection(float value)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->Krefl = value;
 }
 
 void
 RPSetMaterialRefraction(float value)
 {
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    Material_t *m;
+
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
-
+    m = RPScene.material_list[CurrentMaterialIndex];
     m->Krefr = value;
 }
 
@@ -236,12 +291,14 @@ void
 RPSetMaterialTexture(char *name, int channel)
 {
     int		texnum;
+    Material_t  *m;
 
-    if (CurrentMaterial == (Material_t *)NULL) {
-	CurrentMaterial = NewMaterial();
+    if (RPScene.material_list[CurrentMaterialIndex] == (Material_t *)NULL) {
+	RPScene.material_list[CurrentMaterialIndex] = RPNewMaterial();
+	RPScene.material_count++;
     }
 
-    Material_t *m = CurrentMaterial;
+    m = RPScene.material_list[CurrentMaterialIndex];
 
     if ((channel < MATERIAL_COLOR) || (channel > MATERIAL_CHANNELS)) {
 	channel = MATERIAL_COLOR;

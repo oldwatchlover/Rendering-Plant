@@ -53,6 +53,7 @@ static Vtx_t	temp_vtx;
 static int 	tvcnt = 0;
 static Tri_t	temp_tri;
 static int 	ttcnt = 0;
+static int	current_material = 0;
 
 /* flags are held here temporarily during parsing, these should be 
  * cleared when the appropriate command is finished
@@ -1321,6 +1322,22 @@ tri:
 		temp_tri.v0 = $2;
 		temp_tri.v1 = $4;
 		temp_tri.v2 = $6;
+		temp_tri.material_id = current_material;
+		RPAddTriangle(&temp_tri);
+		ttcnt++;
+	    } else {
+		sprintf(error_buffer,"%s : triangle buffer overflow.","ERROR");
+		yyerror(error_buffer);
+	    }
+	}
+        |   OP_CURLY iexpression COMMA iexpression COMMA iexpression COMMA iexpression CL_CURLY
+	{	/* handle tri with a per-poly material index */
+	    if (ttcnt < MAX_VERTS) {
+		current_material = $2;
+		temp_tri.v0 = $4;
+		temp_tri.v1 = $6;
+		temp_tri.v2 = $8;
+		temp_tri.material_id = current_material;
 		RPAddTriangle(&temp_tri);
 		ttcnt++;
 	    } else {

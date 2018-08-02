@@ -64,7 +64,6 @@ void	RPCalculateVertexNormals(Object_t *op, int trinormals);
 void
 RPInitInputPolygons(void)
 {
-    RPScene.input_polys = 0;
     tri_buffer = (Tri_t *) calloc(MAX_TRIS, sizeof(Tri_t));
 }
 
@@ -182,7 +181,7 @@ RPProcessAllTriangles(Object_t *op, int count, Tri_t *tp, int doProject)
     }
 
     if ((op->verts == (Vtx_t *) NULL) || (op->tris  == (Tri_t *) NULL) || 
-	(op->material == (Material_t *) NULL)) {
+	(op->materials == (Material_t *) NULL)) {
 	fprintf(stderr,"%s : ERROR : bad object. (%s, %d)\n",
 		program_name, __FILE__, __LINE__);
 	return;

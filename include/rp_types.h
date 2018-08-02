@@ -131,9 +131,8 @@ typedef struct {
     Tri_t       *tris;
     int         vert_count;
     int         tri_count;
-    Material_t  *material;
-    Material_t  *materials[MAX_OBJ_MATERIALS];	/* future use */
-    int         mtl_count;
+    Material_t  *materials;	/* a list of materials for this object */
+    int		material_count;
     float	mmtx[4][4];
 } Object_t;
 
@@ -185,6 +184,8 @@ typedef struct {
     Colorf_t	ambient;
     Texture_t	*texture_list[MAX_TEXTURES+1];
     int		texture_count;
+    Material_t	*material_list[MAX_MATERIALS];
+    int		material_count;
     int		xres, yres;
     int		num_samples;
     rgba_t	background_color;

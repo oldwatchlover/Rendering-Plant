@@ -101,8 +101,9 @@ extern void     	RPSetGenericSceneFlags(u32 flags);
 extern void     	RPClearGenericSceneFlags(u32 flags);
 
 /* from material.c */
-extern void		RPFreeCurrentMaterial(void);
-extern Material_t     	*RPGetCurrentMaterial(void);
+extern Material_t	*RPNewMaterial(void);
+extern void		RPFreeMaterial(int index);
+extern void	  	RPCleanupMaterials(void);
 extern void		RPSetMaterialName(char *name);
 extern void		RPSetMaterialColor(Colorf_t color);
 extern void		RPSetMaterialAmbient(Colorf_t color);

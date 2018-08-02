@@ -95,9 +95,9 @@ RPInitScene(void)
     RPScene.camera = &default_camera;
     RPScene.viewport = &default_viewport; 
     RPScene.scissor_box = &default_scissor_box; 
-	/* obj_list is empty */
     RPScene.hither = 100.0;
     RPScene.yon = 10000.0;
+	/* obj_list is empty */
     RPScene.obj_count = 0;
 	/* light_list is empty */
     RPScene.light_count = 0;
@@ -105,6 +105,10 @@ RPInitScene(void)
     RPScene.ambient.g = 0.0;
     RPScene.ambient.b = 0.0;
     RPScene.ambient.a = 0.0;
+	/* texture_list is empty */
+    RPScene.texture_count = 0;
+	/* material_list is empty */
+    RPScene.material_count = 0;
     RPScene.xres = MAX_XRES/2;
     RPScene.yres = MAX_YRES/2;
     RPScene.num_samples = 1;

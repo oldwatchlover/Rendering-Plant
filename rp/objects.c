@@ -41,18 +41,6 @@
 
 u32	_RPTempObjRenderFlags = 0x0;
 
-static Material_t default_material = {
-    0x0,    			/* name */
-    {1.0, 1.0, 1.0, 1.0},	/* color */
-    {0.2, 0.2, 0.2, 1.0},	/* amb */
-    {1.0, 1.0, 1.0, 1.0},	/* diff */
-    {1.0, 1.0, 1.0, 1.0},	/* spec */
-    {1.0, 1.0, 1.0, 1.0},	/* highlight color */
-    50.0,			/* shiny */
-    0.0, 0.0,			/* Krefl, Krefr */
-    {0x0, 0x0, 0x0, 0x0},	/* *texture[] */
-};
-
 static Sphere_t * create_bounding_sphere(Object_t *);
 
 extern void    	RPCalculateVertexNormals(Object_t *op, int trinormals);
@@ -66,26 +54,24 @@ Object_t *
 RPAddObject(int type)
 {
     Object_t	*o;
-    Material_t	*m, *cm;
+    int		i;
     
 
     o = (Object_t *) calloc(1, sizeof(Object_t));
-    m = (Material_t *) calloc(1, sizeof(Material_t));
-
-    cm = RPGetCurrentMaterial();
-    if (cm == (Material_t *) NULL) {
-	memcpy(m, &default_material, sizeof(Material_t));
-    } else {
-	memcpy(m, cm, sizeof(Material_t));
-    }
-
     o->flags = _RPTempObjRenderFlags;	/* copy current obj_render_flags to object */
+    o->materials = (Material_t *) calloc(RPScene.material_count, sizeof(Material_t));
 
-    if (!Flagged(o->flags, FLAG_TEXTURE)) {
-	m->texture[MATERIAL_COLOR] = (Texture_t *) NULL;
-	m->texture[MATERIAL_AMBIENT] = (Texture_t *) NULL;
-	m->texture[MATERIAL_DIFFUSE] = (Texture_t *) NULL;
-	m->texture[MATERIAL_SPECULAR] = (Texture_t *) NULL;
+    for (i=0; i<RPScene.material_count; i++) {
+        if (RPScene.material_list[i] == (Material_t *) NULL) {
+	    fprintf(stderr,"%s : ERROR : unexpected NULL material\n", program_name);
+	}
+        memcpy(&(o->materials[i]), RPScene.material_list[i], sizeof(Material_t));
+        if (!Flagged(o->flags, FLAG_TEXTURE)) {
+	    o->materials[i].texture[MATERIAL_COLOR] = (Texture_t *) NULL;
+	    o->materials[i].texture[MATERIAL_AMBIENT] = (Texture_t *) NULL;
+	    o->materials[i].texture[MATERIAL_DIFFUSE] = (Texture_t *) NULL;
+	    o->materials[i].texture[MATERIAL_SPECULAR] = (Texture_t *) NULL;
+        }
     }
 
         /* store current top of model matrix stack with object for later xform */
@@ -94,8 +80,6 @@ RPAddObject(int type)
 
     o->type = type;
     o->id = RPScene.obj_count;
-    o->material = m;
-    o->mtl_count = 1;
 
     RPScene.obj_list[RPScene.obj_count++] = o;
 
@@ -149,8 +133,8 @@ RPFreeObject(Object_t *op)
     if (op->tris != (Tri_t *) NULL)
 	free (op->tris);
 
-    if (op->material != (Material_t *) NULL)
-	free (op->material);
+    if (op->materials != (Material_t *) NULL)
+	free (op->materials);
 
     free (op);
 }
