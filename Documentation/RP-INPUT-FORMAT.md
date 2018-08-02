@@ -204,6 +204,7 @@ Global Scene Commands
 
 Material Commands
   * [material](#material)
+    * [name](#material)
     * [ambient](#material)
     * [diffuse](#material)
     * [specular](#material)
@@ -426,15 +427,20 @@ execution.
 
 For example:
 
-`RENDER01` is interpreted by both `scan` and `paint` as "No Clipping". Setting
+`RENDER01` is interpreted by `draw`, `scan` and `paint` as "No Clipping". Setting
 this flag disables clipping in those renderers. This was added as a debugging
 feature, but could also be useful for acceleration (for example, in video games
 it is common to use a higher-order object visibiity method so that clipping
 is not necessary).
 
-`RENDER02` is interpreted by both `scan` and `paint` as "Outline Triangles".
+`RENDER02` is interpreted by `draw`, `scan` and `paint` as "Outline Triangles".
 Setting this flag causes all triangles drawn to be outlined with a red line.
 This was added as a debugging feature.
+
+`RENDER03` is interpreted by `draw` as "Paint Triangles Also".
+Setting this flag causes all triangles drawn to be painted with their material as well.
+With the proper material, this can create a nice "toon shade" effect using the hidden
+line renderer..
 
 #### Notes
 
@@ -549,6 +555,7 @@ Set a material parameter
 
 #### Specification
 
+        material(name, "red");
         material(color, r, g, b, a);
         material(ambient, r, g, b, a);
         material(diffuse, r, g, b, a);
@@ -556,10 +563,11 @@ Set a material parameter
         material(shiny, float);
         material(reflection, float);
         material(refraction, float);
-        material(texname, string);
+        material(texname, string [, channe]);
 
 #### Parameters
 
+        name            set the material name
         color           set the material color to r,g,b,a (floating point, 0.0-1.0)
         ambient         set the ambient term to r,g,b,a (floating point, 0-1.0)
         diffuse         set the diffuse term to r,g,b,a (floating point, 0-1.0)
@@ -590,10 +598,22 @@ Refraction is the refractive index of the material. See
 [Wikipedia list of refractive indices](https://en.wikipedia.org/wiki/List_of_refractive_indices)
 
 Texname is a name that references a loaded texture. This is the same as the filename
-used to load that texture.
+used to load that texture. Texname has an optional 3rd parameter - "channel". This
+is one of `color`, `ambient`, `diffuse`, `specular`, `highlight`. This selects which
+color channel to map the texture into during shading (similar to Wavefront materials). 
+Currently this is not implemented in the shaders, only in the input stream.
+
+Material name requires a little explanation... the rendering system maintains an
+array of active materials which are "bound" to the object as it is closed. Triangle
+geometry permits per-triangle indices for materials (into that array of materials).
+A material name is a useful aide constructing scens, however the name is really only
+used for Wavefront .obj geometry. The implementation reads the `usemtl` flags
+to encode per-triangle material indices, using the name field to match the material
+in the .obj file. (note that Wavefront `mtllib` and actual materials are 
+currently not imported; materials must be created manually in the **_Rendering Plant_** 
+scene file using the same name to match the geometry file).
 
 #### Notes
-
 
 
 ___
@@ -1068,14 +1088,15 @@ Define a triangle list for a polygonal object
 #### Specification
 
         trilist [numtri] {
-            {v0, v1, v2},
+            { [mtl,] v0, v1, v2},
                 ...
-            {v0, v1, v2},
+            { [mtl,] v0, v1, v2},
         };
 
 #### Parameters
 
         numtri        integer, the number of triangles in the list
+        mtl           integer, optional per-triangle material index
         v0            integer, the index of the 1st vertex of this
                       triangle into the current vertex list
         v1            integer, the index of the 2nd vertex of this
@@ -1092,6 +1113,9 @@ index of the vertex list is 0.
 
 Upon processing this command, the current MODEL and VIEW matrices, as well as
 the current material and render state are bound to this object.
+
+The optional per-triangle material index, references the array of materials bound
+to the object.
  
 #### Notes
 

@@ -280,7 +280,8 @@ follow these steps:
         - set any desired state.
         - call `RPProcessObjects()`. After this, all objects will be in camera space, transformed with the camera at the origin looking down the -Z axis. If you pass `TRUE` to that function, the geometry will also be projected, generating clip codes and screen coordinates.
         - you should then be able to use the `RPScene` and other data structures to create your rendered image.
-        - you can call `RPWriteColorFB()` to output the final image.
+        - if desired, call `RPClipTriangle()` for each triangle in the scene. This will clip the triangle (possibly generating new points/triangles) to the projected view frustum.
+        - you can call `RPWriteColorFB()` to output the final image after it is created.
 
 See the sample code and `Makefile`'s for details.
 
