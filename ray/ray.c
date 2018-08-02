@@ -226,8 +226,7 @@ trace_ray(Ray_t *ray)
 	if (found && t < ray->t) {
 
 	    ray->t = t;
-
-	    m = op->material;
+            m = &(op->materials[0]);
 
 		/* view vector is -ray.dir */
 	    vector_scale(&view, &(ray->dir), -1.0f);
@@ -238,7 +237,7 @@ trace_ray(Ray_t *ray)
 
             } else if (op->type == OBJ_TYPE_POLY) {
 
-	        shade_tri_pixel(color, m, ray, &normal, &surf, &view, op);
+	        shade_tri_pixel(color, ray, &normal, &surf, &view, op);
 
 		if (ray->surf != (TriShade_t *) NULL) {
 		    free(ray->surf);

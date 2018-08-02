@@ -91,6 +91,7 @@ paint_tri(Object_t *op, Tri_t *tri, int usecfb)
 static void
 bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int usecfb)
 {
+    Material_t	*m;
     Vtx_t	*tmpp, tmp_buffer;
     rgba_t	tex_samp;
     int		ydelh, ydelm, ydell, x, y;
@@ -137,10 +138,12 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 	 * (cannot combine these terms for now)
 	 *
 	 */
-    polycolor.r = op->material->color.r;	 /* start with material color: */
-    polycolor.g = op->material->color.g;
-    polycolor.b = op->material->color.b;
-    polycolor.a = op->material->color.a;
+
+    m = &(op->materials[tri->material_id]);
+    polycolor.r = m->color.r; 	/* start with material color: */
+    polycolor.g = m->color.g;
+    polycolor.b = m->color.b;
+    polycolor.a = m->color.a;
 
     if (Flagged(op->flags, FLAG_RANDSHADE)) {
 	/* useful for debugging */
@@ -291,14 +294,14 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		colorsum.a = polycolor.a;
 	    }
 
-	    if (op->material->texture[MATERIAL_COLOR] != (Texture_t *) NULL) {
-		if (Flagged(op->material->texture[MATERIAL_COLOR]->flags, FLAG_TXT_FILT)) {
-		    tex_samp = RPFilterSampleTexture(op->material->texture[MATERIAL_COLOR],
+	    if (m->texture[MATERIAL_COLOR] != (Texture_t *) NULL) {
+		if (Flagged(m->texture[MATERIAL_COLOR]->flags, FLAG_TXT_FILT)) {
+		    tex_samp = RPFilterSampleTexture(m->texture[MATERIAL_COLOR],
 						   thiss, thist, thisw,
 						   DxDs, DyDs, DxDt, DyDt,
 						   DxDw, DyDw);
 		} else {
-		    tex_samp = RPPointSampleTexture(op->material->texture[MATERIAL_COLOR],
+		    tex_samp = RPPointSampleTexture(m->texture[MATERIAL_COLOR],
 						    thiss, thist, thisw);
 		}
 
@@ -307,7 +310,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 		texcolor.b = (float)tex_samp.b / MAX_COLOR_VAL;
 		texcolor.a = (float)tex_samp.a / MAX_COLOR_VAL;
 
-		if (Flagged(op->material->texture[MATERIAL_COLOR]->flags, FLAG_TXT_MODULATE)) {
+		if (Flagged(m->texture[MATERIAL_COLOR]->flags, FLAG_TXT_MODULATE)) {
 		    colorsum.r *= texcolor.r;
 		    colorsum.g *= texcolor.g;
 		    colorsum.b *= texcolor.b;
@@ -321,7 +324,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
  	    }
 
 	    if (Flagged(op->flags, FLAG_LIGHTING)) {
-		shade_pixel(op, &thisn, &thissurf, &thiseye, &shadeval);
+		shade_pixel(op, tri, &thisn, &thissurf, &thiseye, &shadeval);
 
 		/* mult colorsum by shade values */
 		colorsum.r *= shadeval.r;

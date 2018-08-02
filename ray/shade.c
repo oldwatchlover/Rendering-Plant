@@ -100,7 +100,7 @@ calc_sphere_texcontrib(Colorf_t *pointcolor, xyz_t *N, Object_t *op)
     s = 0.5 + (atan2f(N->z, -N->x) / (2.0*Pi));
     t = 0.5 + (asinf(-N->y) / Pi);
 
-    tex = op->material->texture[MATERIAL_COLOR];
+    tex = op->materials[0].texture[MATERIAL_COLOR];
 
     tex_samp = RPPointSampleTexture(tex, s, t, 1.0);
 
@@ -121,7 +121,7 @@ calc_sphere_texcontrib(Colorf_t *pointcolor, xyz_t *N, Object_t *op)
 
 /* helper function, calculates texture contribution for polygons */
 static void
-calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op)
+calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op, Material_t *m)
 {
     Texture_t	*tex;
     Vtx_t	*vp = tsp->op->verts;
@@ -138,7 +138,7 @@ calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op)
         s = tsp->u * vp[tp->v0].s + tsp->v * vp[tp->v1].s + tsp->w * vp[tp->v2].s;
         t = tsp->u * vp[tp->v0].t + tsp->v * vp[tp->v1].t + tsp->w * vp[tp->v2].t;
 
-        tex = op->material->texture[MATERIAL_COLOR];
+        tex = m->texture[MATERIAL_COLOR];
 
         tex_samp = RPPointSampleTexture(tex, s, t, 1.0);
 
@@ -305,24 +305,26 @@ shade_sphere_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
  *
  */
 void
-shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N, 
+shade_tri_pixel(rgba_t *color, Ray_t *ray, xyz_t *N, 
 		xyz_t *surf, xyz_t *view, Object_t *op)
 {
-    Colorf_t	colorsum, pointcolor;
-    rgba_t	*reflcolor = (rgba_t *) NULL, *refrcolor = (rgba_t *) NULL;
+    Material_t	*tm;
     TriShade_t	*tsp = ray->surf;
+    Colorf_t	colorsum, pointcolor;
+    Light_t	*light;
+    rgba_t	*reflcolor = (rgba_t *) NULL, *refrcolor = (rgba_t *) NULL;
     Vtx_t	*vp = tsp->op->verts;
     Tri_t	*tp = tsp->tri;
-    Light_t	*light;
     float	NdotL, NdotH;
     int		i, inshadow = FALSE;
 
 
 	/* start with point color set to material color */
-    pointcolor.r = m->color.r;
-    pointcolor.g = m->color.g;
-    pointcolor.b = m->color.b;
-    pointcolor.a = m->color.a;
+    tm = &(op->materials[tp->material_id]);
+    pointcolor.r = tm->color.r;
+    pointcolor.g = tm->color.g;
+    pointcolor.b = tm->color.b;
+    pointcolor.a = tm->color.a;
 
     if (!Flagged(op->flags, FLAG_LIGHTING)) { 
 
@@ -362,8 +364,8 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 		/* pointcolor already properly set to material */
         }
 
-        if (m->texture[MATERIAL_COLOR] != NULL) {
-	    calc_tri_texcontrib(&pointcolor, tsp, op);
+        if (tm->texture[MATERIAL_COLOR] != NULL) {
+	    calc_tri_texcontrib(&pointcolor, tsp, op, tm);
         }
 
 	color->r = (u8) Clamp0255(pointcolor.r * MAX_COLOR_VAL);
@@ -442,11 +444,11 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 	}
     }
 
-    if (m->texture[MATERIAL_COLOR] != NULL) {
-	calc_tri_texcontrib(&pointcolor, tsp, op);
+    if (tm->texture[MATERIAL_COLOR] != NULL) {
+	calc_tri_texcontrib(&pointcolor, tsp, op, tm);
     }
 
-    colorsum.r = 0.0f; colorsum.g = 0.0f; colorsum.b = 0.0f; colorsum.a = 0.0f;
+    colorsum.r = 0.0; colorsum.g = 0.0; colorsum.b = 0.0; colorsum.a = 0.0;
 
 	/* sum the contribution of each light */
 
@@ -461,47 +463,47 @@ shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray, xyz_t *N,
 	    inshadow = FALSE;
 
         if (inshadow) { /* in shadow of this light, ambient only */
-            colorsum.r += (m->amb.r * pointcolor.r); 
-            colorsum.g += (m->amb.g * pointcolor.g); 
-            colorsum.b += (m->amb.b * pointcolor.b); 
-            colorsum.a += (m->amb.a * pointcolor.a); 
+            colorsum.r += (tm->amb.r * pointcolor.r); 
+            colorsum.g += (tm->amb.g * pointcolor.g); 
+            colorsum.b += (tm->amb.b * pointcolor.b); 
+            colorsum.a += (tm->amb.a * pointcolor.a); 
 	} else {				/* not in shadow, full lighting */
 
             calc_N_L_H(&NdotL, &NdotH, N, &(light->pos), surf, view);
-            NdotH = powf(NdotH, m->shiny);
+            NdotH = powf(NdotH, tm->shiny);
 
-	    colorsum.r += (m->amb.r * pointcolor.r * light->color.r) + 
-			  (m->diff.r * NdotL * pointcolor.r * light->color.r) + 
-			  (m->spec.r * NdotH * m->highlight.r * light->color.r);
-	    colorsum.g += (m->amb.g * pointcolor.g * light->color.g) + 
-			  (m->diff.g * NdotL * pointcolor.g * light->color.g) + 
-			  (m->spec.g * NdotH * m->highlight.g * light->color.g);
-	    colorsum.b += (m->amb.b * pointcolor.b * light->color.b) + 
-			  (m->diff.b * NdotL * pointcolor.b * light->color.b) + 
-			  (m->spec.b * NdotH * m->highlight.b * light->color.b);
-	    colorsum.a += (m->amb.a * pointcolor.a * light->color.a) +
-			  (m->diff.a * NdotL * pointcolor.a * light->color.a) + 
-			  (m->spec.a * NdotH * m->highlight.a * light->color.a);
+	    colorsum.r += (tm->amb.r * pointcolor.r * light->color.r) + 
+			  (tm->diff.r * NdotL * pointcolor.r * light->color.r) + 
+			  (tm->spec.r * NdotH * tm->highlight.r * light->color.r);
+	    colorsum.g += (tm->amb.g * pointcolor.g * light->color.g) + 
+			  (tm->diff.g * NdotL * pointcolor.g * light->color.g) + 
+			  (tm->spec.g * NdotH * tm->highlight.g * light->color.g);
+	    colorsum.b += (tm->amb.b * pointcolor.b * light->color.b) + 
+			  (tm->diff.b * NdotL * pointcolor.b * light->color.b) + 
+			  (tm->spec.b * NdotH * tm->highlight.b * light->color.b);
+	    colorsum.a += (tm->amb.a * pointcolor.a * light->color.a) +
+			  (tm->diff.a * NdotL * pointcolor.a * light->color.a) + 
+			  (tm->spec.a * NdotH * tm->highlight.a * light->color.a);
         }
     }
 
-    if (m->Krefl > 0.0) {
+    if (tm->Krefl > 0.0) {
 	reflcolor = spawn_reflection(ray, op->id, surf, N); 
 		/* add reflection contribution */
         if (reflcolor != (rgba_t *) NULL) {
-	    colorsum.r = (m->Krefl * (float)reflcolor->r * one255) + 
-			 ((1.0 - m->Krefl) * colorsum.r);
-	    colorsum.g = (m->Krefl * (float)reflcolor->g * one255) + 
-			 ((1.0 - m->Krefl) * colorsum.g);
-	    colorsum.b = (m->Krefl * (float)reflcolor->b * one255) + 
-			 ((1.0 - m->Krefl) * colorsum.b);
+	    colorsum.r = (tm->Krefl * (float)reflcolor->r * one255) + 
+			 ((1.0 - tm->Krefl) * colorsum.r);
+	    colorsum.g = (tm->Krefl * (float)reflcolor->g * one255) + 
+			 ((1.0 - tm->Krefl) * colorsum.g);
+	    colorsum.b = (tm->Krefl * (float)reflcolor->b * one255) + 
+			 ((1.0 - tm->Krefl) * colorsum.b);
 		/* reflection doesn't modify alpha */
 	    free (reflcolor);
 	}
     }
 
-    if (m->Krefr > 0.0) {
-	refrcolor = spawn_refraction(ray, op->id, m, surf, N); 
+    if (tm->Krefr > 0.0) {
+	refrcolor = spawn_refraction(ray, op->id, tm, surf, N); 
         if (refrcolor != (rgba_t *) NULL) {
             float	alpha; 
 		/* add refraction contribution, using alpha (transparency) */

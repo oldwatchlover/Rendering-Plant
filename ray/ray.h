@@ -97,7 +97,7 @@ extern int      object_intersect(Ray_t *ray, Object_t *op, float *t, xyz_t *p, x
 /* from rayshade.c */
 extern void     shade_sphere_pixel(rgba_t *color, Material_t *m, Ray_t *ray,
                         xyz_t *normal, xyz_t *surf, xyz_t *view, Object_t *op);
-extern void     shade_tri_pixel(rgba_t *color, Material_t *m, Ray_t *ray,
+extern void     shade_tri_pixel(rgba_t *color, Ray_t *ray,
                         xyz_t *normal, xyz_t *surf, xyz_t *view, Object_t *op);
 #endif
 /* __RAY_H__ */

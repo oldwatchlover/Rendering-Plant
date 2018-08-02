@@ -52,7 +52,7 @@ extern void	paint_scene(void);
 extern void     paint_tri(Object_t *op, Tri_t *tri, int usecfb);
 
 /* from paintshade.c */
-extern void	shade_pixel(Object_t *op, 
+extern void	shade_pixel(Object_t *op, Tri_t *tri, 
 			xyz_t *N, xyz_t *point, xyz_t *view, Colorf_t *shade);
 
 #endif

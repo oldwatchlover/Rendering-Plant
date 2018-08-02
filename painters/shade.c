@@ -46,7 +46,7 @@
  *
  */
 void
-shade_pixel(Object_t *op, xyz_t *norm, xyz_t *point, xyz_t *view, Colorf_t *shade)
+shade_pixel(Object_t *op, Tri_t *tri, xyz_t *norm, xyz_t *point, xyz_t *view, Colorf_t *shade)
 {
     Material_t		*m;
     Light_t		*light;
@@ -54,7 +54,7 @@ shade_pixel(Object_t *op, xyz_t *norm, xyz_t *point, xyz_t *view, Colorf_t *shad
     float       	NdotL, NdotH;
     int			i;
 
-    m = op->material;
+    m = &(op->materials[tri->material_id]);
 
     shade->r = 0.0; shade->g = 0.0; shade->b = 0.0; shade->a = 0.0;
 

@@ -56,7 +56,6 @@ trace_primary_ray(Ray_t *ray, ep_t *eplist)
 {
     ep_t	*ep = eplist;
     Object_t    *op;
-    Material_t  *m;
     Tri_t	*tp;
     rgba_t      *color = (rgba_t *) NULL;
     xyz_t       surf, view, normal;
@@ -110,13 +109,11 @@ trace_primary_ray(Ray_t *ray, ep_t *eplist)
         if (found && t < ray->t) {
 
             ray->t = t;
-            m = op->material;
             vector_scale(&view, &(ray->dir), -1.0f); /* view vector is -ray.dir */
-
 
             RayStats.primary_ray_hit_count++;
 
-            shade_tri_pixel(color, m, ray, &normal, &surf, &view, op);
+            shade_tri_pixel(color, ray, &normal, &surf, &view, op);
 
 	    if (ray->surf != (TriShade_t *) NULL)
 	        free (ray->surf);
