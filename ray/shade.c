@@ -98,7 +98,7 @@ calc_sphere_texcontrib(Colorf_t *pointcolor, xyz_t *N, Object_t *op)
     float	s, t;
 
     s = 0.5 + (atan2f(N->z, -N->x) / (2.0*Pi));
-    t = 0.5 + (asinf(-N->y) / Pi);
+    t = 0.5 + (asinf(N->y) / Pi);
 
     tex = op->materials[0].texture[MATERIAL_COLOR];
 
@@ -126,6 +126,7 @@ calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op, Materia
     Texture_t	*tex;
     Vtx_t	*vp = tsp->op->verts;
     Tri_t	*tp = tsp->tri;
+    uv_t	*tcp = tsp->op->tcoords;
     rgba_t	tex_samp;
     float	s, t;
 
@@ -134,9 +135,18 @@ calc_tri_texcontrib(Colorf_t *pointcolor, TriShade_t *tsp, Object_t *op, Materia
 		/* pointcolor already properly set to material */
         fprintf(stderr,"ERROR : trying to do TEXTURE with missing data (3)\n");
     } else {
-		/* use barycentric coords to calc interp texture coords */
-        s = tsp->u * vp[tp->v0].s + tsp->v * vp[tp->v1].s + tsp->w * vp[tp->v2].s;
-        t = tsp->u * vp[tp->v0].t + tsp->v * vp[tp->v1].t + tsp->w * vp[tp->v2].t;
+	/* use barycentric coords to calc interp texture coords */
+ 	if (Flagged(tp->flags, FLAG_TRI_CLIP_GEN)) {
+                /* texture coord already in s,t */
+            s = tsp->u * vp[tp->v0].s + tsp->v * vp[tp->v1].s + tsp->w * vp[tp->v2].s;
+            t = tsp->u * vp[tp->v0].t + tsp->v * vp[tp->v1].t + tsp->w * vp[tp->v2].t;
+	} else if (tcp != (uv_t *) NULL) {	/* use tcoord array */
+            s = tsp->u * tcp[tp->t0].u + tsp->v * tcp[tp->t1].u + tsp->w * tcp[tp->t2].u;
+            t = tsp->u * tcp[tp->t0].v + tsp->v * tcp[tp->t1].v + tsp->w * tcp[tp->t2].v;
+	} else {
+            s = tsp->u * vp[tp->v0].s + tsp->v * vp[tp->v1].s + tsp->w * vp[tp->v2].s;
+            t = tsp->u * vp[tp->v0].t + tsp->v * vp[tp->v1].t + tsp->w * vp[tp->v2].t;
+	}
 
         tex = m->texture[MATERIAL_COLOR];
 
