@@ -176,7 +176,7 @@ read_bmp(const char *filename, Texture_t *tex)
     }
 
     	/* read in the BMP pixel data */
-    for (i=(tex->yres-1); i>=0; i--) {
+    for (i=0; i<tex->yres; i++) {
         readval = fread(line, 1, bpl, file);
    	if (readval != bpl) {
 	    fprintf(stderr,
