@@ -118,6 +118,7 @@ main(int argc, char *argv[])
 	    
 	  case 'd':
 	    if (argv[1][2] == 'd') {
+	        RPSetSceneFlags(FLAG_VERBOSE);
 	        RPSetSceneFlags(FLAG_VERBOSE2);
 	    } else {
 	        RPSetSceneFlags(FLAG_VERBOSE);
