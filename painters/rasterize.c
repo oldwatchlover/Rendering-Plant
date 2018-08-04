@@ -42,6 +42,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #include "rp.h"
 #include "paint.h"
@@ -89,10 +90,10 @@ paint_tri(Object_t *op, Tri_t *tri, int usecfb)
  *
  */
 static void
-bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int usecfb)
+bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int usecfb)
 {
     Material_t	*m;
-    Vtx_t	*tmpp, tmp_buffer;
+    Vtx_t	*tmpp, tmp_buffer, point0, point1, point2, *p0, *p1, *p2;
     rgba_t	tex_samp;
     int		ydelh, ydelm, ydell, x, y;
     int		Hdx, Hdy, Mdx, Mdy;
@@ -107,6 +108,12 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
     xyz_t	Hdsurf, Mdsurf, DxDsurf, DyDsurf, thissurf;
     xyz_t	Hdnorm, Mdnorm, DxDnorm, DyDnorm, thisn;
     xyz_t	Hdeye, Mdeye, DxDeye, DyDeye, thiseye;
+
+
+	/* copy the input points becuase they are shared and we may modify: */
+    bcopy((void *) ip0, &point0, sizeof(Vtx_t)); p0 = &point0;
+    bcopy((void *) ip1, &point1, sizeof(Vtx_t)); p1 = &point1;
+    bcopy((void *) ip2, &point2, sizeof(Vtx_t)); p2 = &point2;
 
     /* edge deltas: */
     Mdx = p1->sx - p0->sx;          Mdy = p1->sy - p0->sy;
@@ -158,6 +165,26 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *p0, Vtx_t *p1, Vtx_t *p2, int us
 	polycolor.a = tri->color.a;
     } else if (Flagged(op->flags, FLAG_VERTSHADE)) {
 	/* do nothing, rasterizer loop will interp vertex colors */
+    }
+
+	/* fix texture coordinates, want to rasterize in perspected space: */
+    if (Flagged(tri->flags, FLAG_TRI_CLIP_GEN)) {
+		/* texture coord already in s,t */
+	p0->s *= p0->inv_w;
+	p0->t *= p0->inv_w;
+	p1->s *= p1->inv_w;
+	p1->t *= p1->inv_w;
+	p2->s *= p2->inv_w;
+	p2->t *= p2->inv_w;
+    } else {
+        if (op->tcoords != (uv_t *) NULL) {
+            p0->s = op->tcoords[tri->t0].u * p0->inv_w;
+            p0->t = op->tcoords[tri->t0].v * p0->inv_w;
+            p1->s = op->tcoords[tri->t1].u * p1->inv_w;
+            p1->t = op->tcoords[tri->t1].v * p1->inv_w;
+            p2->s = op->tcoords[tri->t2].u * p2->inv_w;
+            p2->t = op->tcoords[tri->t2].v * p2->inv_w;
+        }
     }
 
     /* y-sort the 3 vertices of the triangle: */
