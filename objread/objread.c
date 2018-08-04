@@ -116,6 +116,19 @@ read_obj_from_file(char *filename, Object_t *op)
     op->tri_count = input_tri_count;
     op->vert_count = input_vertex_count;
 
+    if (input_texcoord_count > 0) {
+	op->tcoord_count = input_texcoord_count;
+	op->tcoords = (uv_t *) malloc(input_texcoord_count * sizeof(uv_t));
+
+	for (i=0; i<input_texcoord_count; i++) {
+	    op->tcoords[i].u = TexCoordList[i].u;
+	    op->tcoords[i].v = TexCoordList[i].v;
+	}
+    } else {
+	op->tcoord_count = 0;
+	op->tcoords = (uv_t *) NULL;
+    }
+
         /* copy geometry data */
 
     vp = op->verts;
@@ -146,6 +159,14 @@ read_obj_from_file(char *filename, Object_t *op)
 	tp->v0 = itp->v0;
 	tp->v1 = itp->v1;
 	tp->v2 = itp->v2;
+
+	tp->n0 = itp->n0;
+	tp->n1 = itp->n1;
+	tp->n2 = itp->n2;
+
+	tp->t0 = itp->t0;
+	tp->t1 = itp->t1;
+	tp->t2 = itp->t2;
 
  	tp->material_id = itp->material_id;
 
