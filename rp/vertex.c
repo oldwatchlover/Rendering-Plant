@@ -247,13 +247,8 @@ RPProjectAllVertices(int count, Vtx_t *vp)
 
         /* some algorithms shade in world space but the default is to 
          * leave the texture coordinates un-corrected by perspective 
-         * (renderer should call to set this scene flag if it needs it) 
+	 * the rasterizer code will do the divide if necessary
          */
-	if (Flagged(RPScene.flags, FLAG_PERSP_TEXTURE)) {
-			/* keep texture coords as perspective normalized: */
-            vp[j].s *= vp[j].inv_w; 
-            vp[j].t *= vp[j].inv_w;
-        }
 
         /* viewport mapping (flip y due to BMP image space orientation) */
         vp[j].sx = (int) (t.x *  RPScene.viewport->sx + RPScene.viewport->tx + 0.5);
