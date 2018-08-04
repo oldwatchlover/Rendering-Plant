@@ -77,6 +77,8 @@ typedef struct {
 
 typedef struct {
     int         v0, v1, v2;	/* index into vertex array */
+    int         n0, n1, n2;	/* index into normal array */
+    int         t0, t1, t2;	/* index into texture array */
     u16 	flags;		/* for back/front facing and clipping use */
     short int	material_id;	/* future use, index into list of object materials */
     Colorf_t	color;		/* poly color, if desired */
@@ -128,8 +130,12 @@ typedef struct {
     u32		flags;
     Sphere_t    *sphere;        /* sphere, or bounding sphere */
     Vtx_t       *verts;
-    Tri_t       *tris;
     int         vert_count;
+    xyz_t	*normals;
+    int		norm_count;
+    uv_t	*tcoords;
+    int		tcoord_count;
+    Tri_t       *tris;
     int         tri_count;
     Material_t  *materials;	/* a list of materials for this object */
     int		material_count;
