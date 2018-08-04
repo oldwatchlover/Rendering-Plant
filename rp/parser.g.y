@@ -1323,6 +1323,12 @@ tri:
 		temp_tri.v1 = $4;
 		temp_tri.v2 = $6;
 		temp_tri.material_id = current_material;
+
+		/* use same vertex index for normals and texcoords */
+		temp_tri.n0 = temp_tri.t0 = temp_tri.v0;
+		temp_tri.n1 = temp_tri.t1 = temp_tri.v1;
+		temp_tri.n2 = temp_tri.t2 = temp_tri.v2;
+
 		RPAddTriangle(&temp_tri);
 		ttcnt++;
 	    } else {
@@ -1338,6 +1344,12 @@ tri:
 		temp_tri.v1 = $6;
 		temp_tri.v2 = $8;
 		temp_tri.material_id = current_material;
+
+		/* use same vertex index for normals and texcoords */
+		temp_tri.n0 = temp_tri.t0 = temp_tri.v0;
+		temp_tri.n1 = temp_tri.t1 = temp_tri.v1;
+		temp_tri.n2 = temp_tri.t2 = temp_tri.v2;
+
 		RPAddTriangle(&temp_tri);
 		ttcnt++;
 	    } else {

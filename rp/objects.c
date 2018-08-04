@@ -60,6 +60,7 @@ RPAddObject(int type)
     o = (Object_t *) calloc(1, sizeof(Object_t));
     o->flags = _RPTempObjRenderFlags;	/* copy current obj_render_flags to object */
     o->materials = (Material_t *) calloc(RPScene.material_count, sizeof(Material_t));
+    o->material_count = RPScene.material_count;
 
     for (i=0; i<RPScene.material_count; i++) {
         if (RPScene.material_list[i] == (Material_t *) NULL) {
@@ -80,6 +81,12 @@ RPAddObject(int type)
 
     o->type = type;
     o->id = RPScene.obj_count;
+
+    o->normals = (xyz_t *) NULL;
+    o->norm_count = 0;
+
+    o->tcoords = (uv_t *) NULL;
+    o->tcoord_count = 0;
 
     RPScene.obj_list[RPScene.obj_count++] = o;
 

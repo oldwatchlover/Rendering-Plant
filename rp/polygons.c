@@ -80,6 +80,7 @@ void
 RPCloseTriangleList(int tcount)
 {
     Object_t	*op;
+    int		i;
     
     if (tcount != tri_count) {
 	fprintf(stderr,"%s : WARNING : something wrong, %d != %d tri count\n",
@@ -102,13 +103,29 @@ RPCloseTriangleList(int tcount)
 		sizeof(Vtx_t)*_RPInputVertexCount);
     memcpy((void *)op->tris, (void *)&(tri_buffer[0]), sizeof(Tri_t)*tri_count);
 
-    _RPInputVertexCount = 0;	/* reset input buffer for the next input object */
-    tri_count = 0;
+	/* copy normals and texture coordinates: */
+	/* for data input this way, the index is the same as the vertex index */
+
+    op->tcoords = (uv_t *) malloc(op->vert_count * sizeof(uv_t));
+    op->tcoord_count = op->vert_count;
+    for (i=0; i<op->vert_count; i++) {
+	op->tcoords[i].u = op->verts[i].s;
+	op->tcoords[i].v = op->verts[i].t;
+
+	/* vertex s,t variables used for input and for screen space rasterizer
+	 * shaders will pull texture coords from the op->tcoords array
+	 */
+	op->verts[i].s = 0.0;
+	op->verts[i].t = 0.0;
+    }
 
     if (Flagged(RPScene.flags, FLAG_VERBOSE)) {
 	fprintf(stderr," +Added Object %d ... poly: %d verts, %d triangles\n",
 		op->id,op->vert_count,op->tri_count);
     }
+
+    _RPInputVertexCount = 0;	/* reset input buffer for the next input object */
+    tri_count = 0;
 }
 
 /* add a triangle to the triangle list: */

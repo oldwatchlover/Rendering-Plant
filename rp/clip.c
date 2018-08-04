@@ -242,18 +242,15 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
     bcopy((void *)&(vp[v2]), (void *)&(temp0[1]), sizeof(Vtx_t));
     bcopy((void *)&(vp[v3]), (void *)&(temp0[2]), sizeof(Vtx_t));
 
-	/* if we are going to rasterize perspective-correct textures,
-         * temporarily un-do that while we interpolate the s,t during 
-         * clip, then re-divide after the clip below
-	 * (we know from vertex.c that inv_w can't be 0.0, so no check)
-	 */
-    if (Flagged(RPScene.flags, FLAG_PERSP_TEXTURE)) {
-            temp0[0].s /= temp0[0].inv_w;
-            temp0[0].t /= temp0[0].inv_w;
-            temp0[1].s /= temp0[1].inv_w;
-            temp0[1].t /= temp0[1].inv_w;
-            temp0[2].s /= temp0[2].inv_w;
-            temp0[2].t /= temp0[2].inv_w;
+        /* fix texture coordinates: */
+	/* (we leave the projection (div by w) to the rasterizer) */
+    if (op->tcoords != (uv_t *) NULL) {
+        temp0[0].s = op->tcoords[tri->t0].u;
+        temp0[0].t = op->tcoords[tri->t0].v;
+        temp0[1].s = op->tcoords[tri->t1].u;
+        temp0[1].t = op->tcoords[tri->t1].v;
+        temp0[2].s = op->tcoords[tri->t2].u;
+        temp0[2].t = op->tcoords[tri->t2].v;
     }
 
 /* this macro sets the buffer pointers, called for each edge test
@@ -384,13 +381,8 @@ RPClipTriangle(Object_t *op, Tri_t *tri)
         t.y = temp1[i].proj.y * temp1[i].inv_w;
         t.z = temp1[i].proj.z * temp1[i].inv_w;
 
-	/* if we are going to rasterize perspective-correct textures,
-         * then divide s,t by w for the rasterizer
-	 */
-        if (Flagged(RPScene.flags, FLAG_PERSP_TEXTURE)) {
-            temp1[i].s *= temp1[i].inv_w;
-            temp1[i].t *= temp1[i].inv_w;
-        }
+		/* keep tex coords un-projected until the rasterizer */
+
 		/* flip y due to output BMP file orientation */
         temp1[i].sx = (t.x *  RPScene.viewport->sx) + RPScene.viewport->tx;
         temp1[i].sy = (t.y * -RPScene.viewport->sy) + RPScene.viewport->ty;

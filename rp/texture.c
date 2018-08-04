@@ -458,10 +458,10 @@ RPGenerateSphericalTexcoords(Object_t *op)
     for (i=0; i<op->vert_count; i++) {
 
 	s = 0.5 + (atan2f(vp[i].n.z, -vp[i].n.x) / (2.0 * Pi));
-        t = 0.5 + (asinf(-vp[i].n.y) / Pi);
+        t = 0.5 + (asinf(vp[i].n.y) / Pi);
 
-	vp[i].s = s;
-	vp[i].t = t;
+	op->tcoords[i].u = s;
+	op->tcoords[i].v = t;
     }
 }
 
