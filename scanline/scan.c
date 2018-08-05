@@ -122,6 +122,7 @@ scan_scene(void)
 
     RPCleanupObjects();
     RPCleanupTextures();
+    RPCleanupMaterials();
 
     fprintf(stderr,"\b\b\b\b\b\b\b\b100 %% ... done!\n");
 

@@ -160,7 +160,6 @@ RPFreeTexture(int texnum)
 
     if (tp->filename != (char *) NULL) {
 	free (tp->filename);
-	tp->filename = (char *) NULL;
     }
 
     if (tp->tmem != (rgba_t **) NULL) {
@@ -170,11 +169,7 @@ RPFreeTexture(int texnum)
 	free (tp->tmem);
     }
 
-    tp->flags = 0x0;
-    tp->xres = tp->yres = 0;
-    tp->sscale = tp->tscale = 0.0;
-    tp->soff = tp->toff = 0.0;
-
+	/* doesn't actually free this memory, but wipes it */
     bzero(tp, sizeof(Texture_t));
 }
 

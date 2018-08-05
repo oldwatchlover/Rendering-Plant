@@ -137,6 +137,12 @@ RPFreeObject(Object_t *op)
     if (op->verts != (Vtx_t *) NULL)
 	free (op->verts);
 
+    if (op->normals != (xyz_t *) NULL)
+	free (op->normals);
+
+    if (op->tcoords != (uv_t *) NULL)
+	free (op->tcoords);
+
     if (op->tris != (Tri_t *) NULL)
 	free (op->tris);
 

@@ -110,6 +110,10 @@ paint_scene(void)
         fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*100.0);
     }
 
+    RPCleanupObjects();
+    RPCleanupTextures();
+    RPCleanupMaterials();
+
     fprintf(stderr,"\b\b\b\b\b\b\b\b100 %% ... done!\n");
 
     fprintf(stderr,"\n%s : Rendering Summary:\n",program_name);

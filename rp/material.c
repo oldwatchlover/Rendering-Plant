@@ -84,6 +84,8 @@ RPFreeMaterial(int index)
 	    free (RPScene.material_list[index]->name);
 	}
 
+	/* don't free texture, we expect RPCleanupTextures() to do that */
+
 	free (RPScene.material_list[index]);
 	RPScene.material_list[index] = (Material_t *) NULL;
     }
