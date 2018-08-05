@@ -395,13 +395,7 @@ command:
 	    int 	tcnt;
 
 	    tcnt = $3;
-	    if (tcnt > MAX_TRIS) {
-		sprintf(error_buffer,"%s : too many triangles in trilist (%d).",
-                        "ERROR", tcnt);
-		yyerror(error_buffer);
-	    } else {
-		RPCloseTriangleList(tcnt);
-            }
+	    RPCloseTriangleList(tcnt);
 	    ttcnt = 0;	/* reset temp tri buffer */
 	}
         |   VERTEX OP_BRACKET iexpression CL_BRACKET OP_CURLY pointlist CL_CURLY SEMICOLON
@@ -409,13 +403,7 @@ command:
 	    int 	vcnt;
 
 	    vcnt = $3;
-	    if (vcnt > MAX_VERTS) {
-		sprintf(error_buffer,"%s : too many vertices (%d).",
-                        "ERROR", vcnt);
-		yyerror(error_buffer);
-	    } else {
-		RPCloseVertexList(vcnt);
-            }
+  	    RPCloseVertexList(vcnt);
 	    tvcnt = 0;	/* reset temp points buffer */
 	}
         |   VIEWPORT OP_PAREN fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON

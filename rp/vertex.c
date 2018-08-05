@@ -64,6 +64,12 @@ RPFreeInputVertices(void)
 void
 RPAddVertex(Vtx_t *vtx, int i)
 {
+        /* max exceeded, extend array */
+    if (_RPInputVertexCount >= MAX_VERTS) {
+        _RPInputVertexBuffer = (Vtx_t *) realloc(_RPInputVertexBuffer, 
+		(_RPInputVertexCount + MAX_VERTS) * sizeof(Vtx_t));
+    }
+    
     bcopy((void *)vtx, (void *)&(_RPInputVertexBuffer[i]), sizeof(Vtx_t));
     _RPInputVertexCount++;
 }

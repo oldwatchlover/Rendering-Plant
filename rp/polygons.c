@@ -132,6 +132,11 @@ RPCloseTriangleList(int tcount)
 void
 RPAddTriangle(Tri_t *tri)
 {
+	/* max exceeded, extend array */
+    if (tri_count >= MAX_TRIS) {
+	tri_buffer = (Tri_t *) realloc(tri_buffer, (tri_count + MAX_TRIS) * sizeof(Tri_t));
+    }
+
     if (tri != (Tri_t *) NULL) {
         bcopy((char *)tri, (char *)&(tri_buffer[tri_count]), sizeof(Tri_t));
         tri_count++;

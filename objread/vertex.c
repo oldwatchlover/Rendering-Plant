@@ -47,8 +47,8 @@ add_vertex(float x, float y, float z, float w)
     debug_printf(stderr,"adding v : \t%8.3f, %8.3f, %8.3f, %8.3f\n",x,y,z,w);
 
     if (input_vertex_count >= MAX_VERTS) {
-	fprintf(stderr,"ERROR : too many vertices! %d\n",input_vertex_count);
-	exit(-1);
+        VertexList = (vertex_t *) realloc(VertexList, 
+			(input_vertex_count + MAX_VERTS) * sizeof(Tri_t));
     }
 
     vp = &(VertexList[input_vertex_count]);
@@ -80,8 +80,8 @@ add_vtexcoords(int n, float u, float v, float w)
     debug_printf(stderr,"adding vt %d : \t%8.3f, %8.3f, %8.3f\n",n,u,v,w);
 
     if (input_texcoord_count >= MAX_VERTS) {
-	fprintf(stderr,"ERROR : too many tex coords! %d\n",input_texcoord_count);
-	exit(-1);
+        TexCoordList = (uv_t *) realloc(TexCoordList, 
+			(input_texcoord_count + MAX_VERTS) * sizeof(uv_t));
     }
 
     tp = &(TexCoordList[input_texcoord_count]);
@@ -100,8 +100,8 @@ add_vnormal(float x, float y, float z)
     debug_printf(stderr,"adding vn : \t%8.3f, %8.3f, %8.3f\n",x,y,z);
 
     if (input_normal_count >= MAX_VERTS) {
-	fprintf(stderr,"ERROR : too many normals! %d\n",input_normal_count);
-	exit(-1);
+        NormalList = (xyz_t *) realloc(NormalList, 
+			(input_normal_count + MAX_VERTS) * sizeof(xyz_t));
     }
 
     np = &(NormalList[input_normal_count]);

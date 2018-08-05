@@ -50,8 +50,7 @@ add_tri(int v0, int v1, int v2,
     vertex_t	*vp;
 
     if (input_tri_count >= MAX_TRIS) {
-	fprintf(stderr,"ERROR : too many triangles! %d\n",input_tri_count);
-	exit(-1);
+        TriList = (tri_t *) realloc(TriList, (input_tri_count + MAX_TRIS) * sizeof(tri_t));
     }
 
     tp = &(TriList[input_tri_count]);
