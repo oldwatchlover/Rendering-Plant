@@ -314,6 +314,7 @@ command:
 	    expandstring(fmt);
 	    RPLoadTextureFromFile(-1, fmt, temp_txt_flags, sscale, tscale, soff, toff);
 	    temp_txt_flags = 0;
+            free($3);
 	}
         | TEXTURE_FILE OP_PAREN QSTRING COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{
@@ -330,6 +331,7 @@ command:
 	    expandstring(fmt);
 	    RPLoadTextureFromFile(-1, fmt, 0x0, sscale, tscale, soff, toff);
 	    temp_txt_flags = 0x0;
+            free($3);
 	}
         | TEXTURE_FILE OP_PAREN iexpression COMMA QSTRING COMMA txtflaglist COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{
@@ -349,6 +351,7 @@ command:
 	    RPLoadTextureFromFile(texnum, fmt, temp_txt_flags, 
 			 sscale, tscale, soff, toff);
 	    temp_txt_flags = 0;
+            free($5);
 	}
         | TEXTURE_FILE OP_PAREN iexpression COMMA QSTRING COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{
@@ -367,6 +370,7 @@ command:
 	    expandstring(fmt);
 	    RPLoadTextureFromFile(texnum, fmt, 0x0, sscale, tscale, soff, toff);
 	    temp_txt_flags = 0x0;
+            free($5);
 	}
         |   SPHERE OP_PAREN fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{
@@ -389,6 +393,7 @@ command:
 
 	    expandstring(fmt);
 	    RPReadObjectFromFile(fmt);
+            free($3);
 	}
         | TRILIST OP_BRACKET iexpression CL_BRACKET OP_CURLY trilist CL_CURLY SEMICOLON
 	{
@@ -502,6 +507,7 @@ command:
 	    name = $5;
 
 	    RPSetMaterialName(name);
+            free($5);
 	}
 	| MATERIAL OP_PAREN COLOR COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
         {
@@ -590,6 +596,7 @@ command:
 
 	    expandstring(texname);
 	    RPSetMaterialTexture(texname, MATERIAL_COLOR);
+            free($5);
 	}
 	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA COLOR CL_PAREN SEMICOLON
         {
@@ -599,6 +606,7 @@ command:
 
 	    expandstring(texname);
 	    RPSetMaterialTexture(texname, MATERIAL_COLOR);
+            free($5);
 	}
 	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA AMBIENT CL_PAREN SEMICOLON
         {
@@ -608,6 +616,7 @@ command:
 
 	    expandstring(texname);
 	    RPSetMaterialTexture(texname, MATERIAL_AMBIENT);
+            free($5);
 	}
 	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA DIFFUSE CL_PAREN SEMICOLON
         {
@@ -617,6 +626,7 @@ command:
 
 	    expandstring(texname);
 	    RPSetMaterialTexture(texname, MATERIAL_DIFFUSE);
+            free($5);
 	}
 	| MATERIAL OP_PAREN TEXNAME COMMA QSTRING COMMA SPECULAR CL_PAREN SEMICOLON
         {
@@ -626,6 +636,7 @@ command:
 
 	    expandstring(texname);
 	    RPSetMaterialTexture(texname, MATERIAL_SPECULAR);
+            free($5);
 	}
         |   FOG_CMD OP_PAREN fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression COMMA fexpression CL_PAREN SEMICOLON
 	{
@@ -697,6 +708,7 @@ command:
 
 	    expandstring(fmt);
 	    RPSetBackgroundImageFile(fmt);
+            free($3);
 	}
         |   OUTPUT OP_PAREN QSTRING COMMA iexpression COMMA iexpression CL_PAREN SEMICOLON
         {
@@ -709,6 +721,7 @@ command:
 
 	    expandstring(fmt);
 	    RPSetOutput(fmt, xres, yres);
+            free($3);
 	}
         /* high level matrix functions: */
         |   IDENTITY OP_PAREN mtxtype mtxflaglist CL_PAREN SEMICOLON

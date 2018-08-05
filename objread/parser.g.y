@@ -273,6 +273,7 @@ command:
 	    objname = $2;
 
 	    add_object(objname);
+	    free($2);
 	}
 
 /* g input data: */
@@ -316,6 +317,7 @@ command:
 		sscanf(smooth,"%d",&s);
 
 	    add_smooth(s);
+  	    free($2);
 	}
 
 /* mtllib input data: */
@@ -335,6 +337,7 @@ command:
 	    mtl = $2;
 
 	    add_usemtl(mtl);
+	    free($2);
 	}
 
 /* maplib input data: */
@@ -354,6 +357,7 @@ command:
 	    map = $2;
 
 	    add_usemap(map);
+	    free($2);
 	}
 	;
 
@@ -405,6 +409,7 @@ FACEINDEX:
 		fprintf(stderr,"face has too many vertices... [%d]\n",face_index_count);
 		exit(-1);
 	    }
+	    free($1);
 	}
 	| INTEGER
 	{	/* only vertex */
@@ -440,6 +445,7 @@ stringlist:
 	{
 	    stringlist[stringlistcount] = $1;
 	    stringlistcount++;
+	    free($1);
 	}
         | STRING stringlist
 	{
