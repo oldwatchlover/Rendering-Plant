@@ -117,11 +117,10 @@ main(int argc, char *argv[])
 	    break;
 	    
 	  case 'd':
+	  case 'v':
+	    RPSetSceneFlags(FLAG_VERBOSE);
 	    if (argv[1][2] == 'd') {
-	        RPSetSceneFlags(FLAG_VERBOSE);
 	        RPSetSceneFlags(FLAG_VERBOSE2);
-	    } else {
-	        RPSetSceneFlags(FLAG_VERBOSE);
 	    }
 	    break;
 	    
@@ -139,10 +138,6 @@ main(int argc, char *argv[])
 	    RPSetGenericSceneFlags(FLAG_RENDER_03);
 	    break;
 #endif
-
-	  case 'v':
-	    RPSetSceneFlags(FLAG_VERBOSE);
-	    break;
 
 	  case 'y':
 	    parsedebug = TRUE;
