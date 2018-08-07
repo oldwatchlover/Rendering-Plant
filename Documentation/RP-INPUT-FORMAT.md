@@ -567,7 +567,7 @@ Set a material parameter
 
 #### Parameters
 
-        name            set the material name
+        name            set the material name. opens new material.
         color           set the material color to r,g,b,a (floating point, 0.0-1.0)
         ambient         set the ambient term to r,g,b,a (floating point, 0-1.0)
         diffuse         set the diffuse term to r,g,b,a (floating point, 0-1.0)
@@ -603,17 +603,28 @@ is one of `color`, `ambient`, `diffuse`, `specular`, `highlight`. This selects w
 color channel to map the texture into during shading (similar to Wavefront materials). 
 Currently this is not implemented in the shaders, only in the input stream.
 
-Material name requires a little explanation... the rendering system maintains an
-array of active materials which are "bound" to the object as it is closed. Triangle
-geometry permits per-triangle indices for materials (into that array of materials).
-A material name is a useful aide constructing scens, however the name is really only
-used for Wavefront .obj geometry. The implementation reads the `usemtl` flags
-to encode per-triangle material indices, using the name field to match the material
-in the .obj file. (note that Wavefront `mtllib` and actual materials are 
-currently not imported; materials must be created manually in the **_Rendering Plant_** 
-scene file using the same name to match the geometry file).
+Material name requires a little explanation... most objects have a single material,
+and in that case usage of `material(name, ...` is optional (but a good idea)
+If there is only one material, any calls to set material parameters modify the 
+single current material and when an object is created, that material is "bound" 
+to the object. 
+
+However, the rendering system actually maintains an array of active materials internally,
+and geometry can index this array per polygon (see `trilist[]`) or via `usemtl`
+commands in Wavefront `.obj` files.
+
+Multiple materials must use the `material(name, ....` as the first call to create
+a new material, then modify that material with subsequent material calls. When
+the object is closed, this array of named materials will be bound to the object,
+with per-triangle indices for materials (into that array of materials).
 
 #### Notes
+
+This implementation reads the `usemtl` commands in `.obj` files
+to encode per-triangle material indices, using the name field to match the material
+in the `.obj` file. (note that Wavefront `mtllib` and actual materials are 
+currently not imported; materials must be created manually in the **_Rendering Plant_** 
+scene file using the same name that matches the material used in the geometry file).
 
 
 ___
@@ -1097,6 +1108,7 @@ Define a triangle list for a polygonal object
 
         numtri        integer, the number of triangles in the list
         mtl           integer, optional per-triangle material index
+                      mtl can also be a quoted string with the name of the material
         v0            integer, the index of the 1st vertex of this
                       triangle into the current vertex list
         v1            integer, the index of the 2nd vertex of this
@@ -1121,6 +1133,9 @@ to the object.
 
 The comma at the end of the last triangle in the list is optional (similar to C structure
 initialization).
+
+If a triangle in the list does not provide a material index, the most recent material
+index is used.
 
 
 ___

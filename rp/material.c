@@ -51,6 +51,8 @@
 /* current material */
 static int	CurrentMaterialIndex = 0;
 
+static char	*default_name = "_default_material_";
+
 /* create a new material structure: */
 Material_t *
 RPNewMaterial(void)
@@ -60,6 +62,8 @@ RPNewMaterial(void)
     m = (Material_t *) calloc(1, sizeof(Material_t));
 
 	/* calloc() insures everything is zero, except we want: */
+    m->name = (char *) malloc(strlen(default_name)+1);
+    strcpy(m->name, default_name);
     m->color.r = 1.0;
     m->color.g = 1.0;
     m->color.b = 1.0;
@@ -154,6 +158,9 @@ RPSetMaterialName(char *name)
 	RPScene.material_list[index] = RPNewMaterial();
 	CurrentMaterialIndex++;
     }
+
+    if (RPScene.material_list[index]->name != (char *) NULL)
+	free(RPScene.material_list[index]->name);
 
     RPScene.material_list[index]->name = (char *) malloc(strlen(name)+1);
     strcpy(RPScene.material_list[index]->name, name);

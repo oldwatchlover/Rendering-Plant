@@ -45,6 +45,27 @@ static Sphere_t * create_bounding_sphere(Object_t *);
 
 extern void    	RPCalculateVertexNormals(Object_t *op, int trinormals);
 
+#if 0
+static void
+dump_material(Material_t *m)
+{
+    fprintf(stderr,"material [%s]\n",m->name);
+    fprintf(stderr,"\tcolor\t= %5.2f %5.2f %5.2f %5.2f\n",
+	m->color.r, m->color.g, m->color.b, m->color.a);
+    fprintf(stderr,"\tamb\t= %5.2f %5.2f %5.2f %5.2f\n",
+	m->amb.r, m->amb.g, m->amb.b, m->amb.a);
+    fprintf(stderr,"\tdiff\t= %5.2f %5.2f %5.2f %5.2f\n",
+	m->diff.r, m->diff.g, m->diff.b, m->diff.a);
+    fprintf(stderr,"\tspec\t= %5.2f %5.2f %5.2f %5.2f\n",
+	m->spec.r, m->spec.g, m->spec.b, m->spec.a);
+    fprintf(stderr,"\ttex: color = %08x amb = %08x diff = %08x spec = %08x\n",
+	(u32)m->texture[MATERIAL_COLOR],
+	(u32)m->texture[MATERIAL_AMBIENT],
+	(u32)m->texture[MATERIAL_DIFFUSE],
+	(u32)m->texture[MATERIAL_SPECULAR]);
+    fprintf(stderr,"\n");
+}
+#endif
 
 /* 
  * returns a generic object to the caller for them to fill in the details
@@ -62,6 +83,9 @@ RPAddObject(int type)
     o->materials = (Material_t *) calloc(RPScene.material_count, sizeof(Material_t));
     o->material_count = RPScene.material_count;
 
+#if 0
+    fprintf(stderr,"binding materials to object:\n");
+#endif
     for (i=0; i<RPScene.material_count; i++) {
         if (RPScene.material_list[i] == (Material_t *) NULL) {
 	    fprintf(stderr,"%s : ERROR : unexpected NULL material\n", program_name);
@@ -73,6 +97,9 @@ RPAddObject(int type)
 	    o->materials[i].texture[MATERIAL_DIFFUSE] = (Texture_t *) NULL;
 	    o->materials[i].texture[MATERIAL_SPECULAR] = (Texture_t *) NULL;
         }
+#if 0
+	dump_material(&(o->materials[i]));
+#endif
     }
 
         /* store current top of model matrix stack with object for later xform */

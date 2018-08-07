@@ -1358,6 +1358,42 @@ tri:
 		yyerror(error_buffer);
 	    }
 	}
+        |   OP_CURLY QSTRING COMMA iexpression COMMA iexpression COMMA iexpression CL_CURLY
+	{	/* handle tri with a per-poly material named */
+ 	    char 	*name;
+            int		index;
+
+	    if (ttcnt < MAX_VERTS) {
+		name = $2;
+		temp_tri.v0 = $4;
+		temp_tri.v1 = $6;
+		temp_tri.v2 = $8;
+		index = RPFindMaterial(name);
+
+		if (index >= 0) {
+		    current_material = index;
+		} else {
+        	    fprintf(stderr,"%s : WARNING : could not find material [%s]\n",
+                		program_name, name);
+		    current_material = 0;
+		}
+
+		temp_tri.material_id = current_material;
+
+		/* use same vertex index for normals and texcoords */
+		temp_tri.n0 = temp_tri.t0 = temp_tri.v0;
+		temp_tri.n1 = temp_tri.t1 = temp_tri.v1;
+		temp_tri.n2 = temp_tri.t2 = temp_tri.v2;
+
+		RPAddTriangle(&temp_tri);
+		ttcnt++;
+	    } else {
+		sprintf(error_buffer,"%s : triangle buffer overflow.","ERROR");
+		yyerror(error_buffer);
+	    }
+
+	    free($2);
+	}
         ;
 
 /* integer expression: a very basic rule: */
