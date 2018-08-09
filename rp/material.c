@@ -117,17 +117,31 @@ RPFindMaterial(char *name)
     if (name == (char *) NULL)
         return (index);
 
+#if 0
+fprintf(stderr,"searching for %s...\n",name);
+#endif
     for (i=0; i<RPScene.material_count && index<0; i++) {
         m = RPScene.material_list[i];
 
         if (m != (Material_t *) NULL) {
             if (m->name != (char *) NULL) {
+#if 0
+fprintf(stderr,"\t[%s] == [%s] (%08x)? ...",name,m->name,(u32)m->name);
+#endif
+
                 if (strcmp(m->name, name) == 0) {
                     index = i;
-                }
+                } else {
+#if 0
+fprintf(stderr,"\n");
+#endif
+		}
             }
         }
     }
+#if 0
+fprintf(stderr,"returning %d\n\n",index);
+#endif
 
     return (index);
 }
@@ -142,11 +156,7 @@ RPSetMaterialName(char *name)
 	return;
     }
 
-    index = RPFindMaterial(name);
-
-    if (index < 0) {
-	index = RPScene.material_count++;
-    }
+    index = RPScene.material_count++;
 
     if (index >= MAX_MATERIALS) {
 	fprintf(stderr,"%s : ERROR : too many materials! (%d)\n",
@@ -156,7 +166,6 @@ RPSetMaterialName(char *name)
 
     if (RPScene.material_list[index] == (Material_t *) NULL) {
 	RPScene.material_list[index] = RPNewMaterial();
-	CurrentMaterialIndex++;
     }
 
     if (RPScene.material_list[index]->name != (char *) NULL)
