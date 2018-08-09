@@ -91,6 +91,11 @@ RPAddObject(int type)
 	    fprintf(stderr,"%s : ERROR : unexpected NULL material\n", program_name);
 	}
         memcpy(&(o->materials[i]), RPScene.material_list[i], sizeof(Material_t));
+	if (RPScene.material_list[i]->name != NULL) {
+		/* must malloc and copy the name... */
+	    o->materials[i].name = malloc(strlen(RPScene.material_list[i]->name)+1);
+	    strcpy(o->materials[i].name, RPScene.material_list[i]->name);
+	}
         if (!Flagged(o->flags, FLAG_TEXTURE)) {
 	    o->materials[i].texture[MATERIAL_COLOR] = (Texture_t *) NULL;
 	    o->materials[i].texture[MATERIAL_AMBIENT] = (Texture_t *) NULL;
@@ -173,8 +178,16 @@ RPFreeObject(Object_t *op)
     if (op->tris != (Tri_t *) NULL)
 	free (op->tris);
 
-    if (op->materials != (Material_t *) NULL)
+    if (op->materials != (Material_t *) NULL) {
+        int		i;
+
+        for (i=0; i<op->material_count; i++) {
+	    if (op->materials[i].name != NULL) {
+	        free(op->materials[i].name);
+	    }
+        }
 	free (op->materials);
+    }
 
     free (op);
 }
@@ -212,7 +225,7 @@ RPProcessObjects(int doProject)
 
 	    RPProcessSphere(op, sp);
 
-	    if (Flagged(RPScene.flags, FLAG_VERBOSE2)) {
+	    if (Flagged(RPScene.flags, FLAG_VERBOSE)) {
 		fprintf(stderr,"final sphere at (%8.3f,%8.3f,%8.3f) radius %f\n",
 			sp->center.x, sp->center.y, sp->center.z, sp->radius);
 	    }
@@ -243,7 +256,7 @@ RPProcessObjects(int doProject)
         	    RPCalculateVertexNormals(op, TRUE);
 	    }
 
-	    if (Flagged(RPScene.flags, FLAG_VERBOSE2)) {
+	    if (Flagged(RPScene.flags, FLAG_VERBOSE)) {
 	        sp = op->sphere;
 		fprintf(stderr, "final poly bounding sphere at (%8.3f,%8.3f,%8.3f) radius %f\n",
 			sp->center.x, sp->center.y, sp->center.z, sp->radius);
