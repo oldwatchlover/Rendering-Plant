@@ -88,6 +88,7 @@ add_edge(Object_t *op, int id, int thistri, int p0, int p1)
 
     if (thisedge < 0) {		/* add new edge to the list */
 
+	ep[objEdges[id]->num_edges].id = total_edges;
 	ep[objEdges[id]->num_edges].tri0 = thistri;
 	ep[objEdges[id]->num_edges].v0 = p0;
 	ep[objEdges[id]->num_edges].v1 = p1;
@@ -96,7 +97,9 @@ add_edge(Object_t *op, int id, int thistri, int p0, int p1)
 	total_edges++;
 
 #ifdef DEBUG_EDGES
-	fprintf(stderr,"\tadding new edge: p0 = %d, p1 = %d from tri %d\n",p0,p1,thistri);
+	fprintf(stderr,"\tadding new edge {%d}: p0 = %d, p1 = %d from tri %d\n",
+			ep[objEdges[id]->num_edges-1].id,
+			p0,p1,thistri);
 	fprintf(stderr,"\t\t(%d,%d) -- (%d,%d)\n",
 		vp[p0].sx,vp[p0].sy, vp[p1].sx,vp[p1].sy);
 #endif
@@ -107,8 +110,8 @@ add_edge(Object_t *op, int id, int thistri, int p0, int p1)
 	    ep[thisedge].tri1 = thistri;
 
 #ifdef DEBUG_EDGES
-	fprintf(stderr,"\tadding tri (%d) to edge (%d): p0 = %d, p1 = %d\n",
-		thistri,thisedge,p0,p1);
+	fprintf(stderr,"\tadding tri (%d) to edge (%d) {%d}: p0 = %d, p1 = %d\n",
+		thistri,thisedge, ep[objEdges[id]->num_edges-1].id, p0,p1);
 	fprintf(stderr,"\t\t(%d,%d) -- (%d,%d)\n",
 		vp[p0].sx,vp[p0].sy, vp[p1].sx,vp[p1].sy);
 #endif
@@ -211,8 +214,8 @@ process_obj_edges(Object_t *op)
 		} else {
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
-	    fprintf(stderr,"silhouette edge, t0 flags = %08x\n",
-			t0->flags);
+	    fprintf(stderr,"silhouette edge {%d}, t0 flags = %08x\n",
+			ep[i].id,t0->flags);
 #endif
 		}
 	    }
@@ -224,8 +227,8 @@ process_obj_edges(Object_t *op)
 	            UnFlag(ep[i].flags, FLAG_ALL);
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
-	    fprintf(stderr,"silhouette edge, t0 flags = %08x\n",
-			t0->flags);
+	    fprintf(stderr,"silhouette edge {%d}, t0 flags = %08x\n",
+			ep[i].id, t0->flags);
 #endif
 		}
 	    }
@@ -237,8 +240,17 @@ process_obj_edges(Object_t *op)
 	    if (costheta < CREASE_TOLERANCE) {
 	        Flag(ep[i].flags, FLAG_EDGE_CREASE);
 #ifdef DEBUG_EDGES
-	    fprintf(stderr,"edge is a crease, t0 = %08x, t1 = %08x %f\n",
-			(int)t0,(int)t1,costheta);
+	    fprintf(stderr,"edge {%d} is a crease, t0 = %08x, t1 = %08x %f\n",
+			ep[i].id,(int)t0,(int)t1,costheta);
+#endif
+	    }
+
+		/* shared edge but different materials is a crease */
+	    if (t0->material_id != t1->material_id) {
+	        Flag(ep[i].flags, FLAG_EDGE_MATERIAL);
+#ifdef DEBUG_EDGES
+ 		fprintf(stderr,"edge {%d} is a crease, shared edge, diff mtl: %d, %d\n",
+			ep[i].id,t0->material_id, t1->material_id);
 #endif
 	    }
 
@@ -261,7 +273,9 @@ process_obj_edges(Object_t *op)
 
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
-	    fprintf(stderr,"one tri BACKFACING, %08x, %08x one not\n",
+	    fprintf(stderr,"edge {%d} is silhouette:\n",
+			ep[i].id);
+	    fprintf(stderr,"\tone tri BACKFACING, %08x, %08x one not\n",
 			t0->flags,t1->flags);
 #endif
 		}
@@ -286,7 +300,9 @@ process_obj_edges(Object_t *op)
 
 	            Flag(ep[i].flags, FLAG_EDGE_SILHOUETTE);
 #ifdef DEBUG_EDGES
-	    fprintf(stderr,"one tri BACKFACING, %08x, %08x one not\n",
+	    fprintf(stderr,"edge {%d} is silhouette:\n",
+			ep[i].id);
+	    fprintf(stderr,"\tone tri FRONTACING, %08x, %08x one not\n",
 			t0->flags,t1->flags);
 #endif
 		}
@@ -323,7 +339,7 @@ static int filter5[5][5] =
 #endif
 
 /* simple DDA line function, handles z-buffer and slightly fat line */
-static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t color)
+static void draw_line(int force, int x0, int y0, int z0, int x1, int y1, int z1, rgba_t color)
 {
     float	x, y, z, dx, dy, dz, step;
     int		i=1, tx, ty, tz;
@@ -370,9 +386,11 @@ static void draw_line(int x0, int y0, int z0, int x1, int y1, int z1, rgba_t col
 
 	zsum /= 32.0;
 
+	if (force) zsum = 1.0;
+
 	if (zsum > 0.5) {
 #else
-	if (RPTestDepthFB(tx, ty, z - (z * DEPTH_BIAS))) {
+	if (force || RPTestDepthFB(tx, ty, z - (z * DEPTH_BIAS))) {
 #endif
 
 		/* we manipulate alhpa for a nice filter effect */
@@ -409,7 +427,7 @@ draw_edges(Object_t *op)
     rgba_t	black = { 0, 0, 0, 255};
     Vtx_t	*vp;
     Edge_t	*ep;
-    int		x0, y0, z0, x1, y1, z1, i, ecnt;
+    int		x0, y0, z0, x1, y1, z1, i, ecnt, force = FALSE;
 
     ecnt = objEdges[op->id]->num_edges;
     ep = (Edge_t *) objEdges[op->id]->edges;
@@ -419,7 +437,8 @@ draw_edges(Object_t *op)
     for (i=0; i<ecnt; i++) {
 
 	if (Flagged(ep[i].flags, FLAG_EDGE_SILHOUETTE) ||
-	    Flagged(ep[i].flags, FLAG_EDGE_CREASE)) {
+	    Flagged(ep[i].flags, FLAG_EDGE_CREASE)     ||
+	    Flagged(ep[i].flags, FLAG_EDGE_MATERIAL)) {
 
 	    x0 = vp[ep[i].v0].sx;
 	    y0 = vp[ep[i].v0].sy;
@@ -429,22 +448,25 @@ draw_edges(Object_t *op)
 	    y1 = vp[ep[i].v1].sy;
 	    z1 = vp[ep[i].v1].sz;
 
+	    if (Flagged(ep[i].flags, FLAG_EDGE_MATERIAL))
+		force = TRUE;	/* force draw regardless of depth buffer */
+
 #ifdef DEBUG_EDGES
 	if (Flagged(ep[i].flags, FLAG_EDGE_SILHOUETTE)) {
-	    fprintf(stderr,"drawing silhouette edge:\t%d, %d\n",
-		ep[i].v0, ep[i].v1);
+	    fprintf(stderr,"drawing silhouette edge {%d}:\t%d, %d\n",
+		ep[i].id,ep[i].v0, ep[i].v1);
 	    fprintf(stderr,"\t(%d,%d) -- (%d,%d)\n",
 		x0,y0,x1,y1);
 	}
 	if (Flagged(ep[i].flags, FLAG_EDGE_CREASE)) {
-	    fprintf(stderr,"drawing crease edge:\t\t%d, %d\n",
-		ep[i].v0, ep[i].v1);
+	    fprintf(stderr,"drawing crease edge {%d}:\t\t%d, %d\n",
+		ep[i].id,ep[i].v0, ep[i].v1);
 	    fprintf(stderr,"\t(%d,%d) -- (%d,%d)\n",
 		x0,y0,x1,y1);
 	}
 #endif
 
-            draw_line(x0, y0, z0, x1, y1, z1, black);
+            draw_line(force, x0, y0, z0, x1, y1, z1, black);
 
 	    drawn_edges++;
 	}

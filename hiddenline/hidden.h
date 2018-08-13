@@ -42,6 +42,7 @@
 #define FLAG_EDGE_CULL_FRONT	FLAG_CULL_FRONT		/* 0x002 */
 #define FLAG_EDGE_SILHOUETTE	0x0004
 #define FLAG_EDGE_CREASE	0x0008
+#define FLAG_EDGE_MATERIAL	0x0010
 
 #define MAX_ZVAL	REALLY_BIG_FLOAT
 
@@ -50,6 +51,7 @@
 	/* an edge structure */
 typedef struct {
 
+    int		id;
     u32		flags;
     int		tri0, tri1;
     int		v0, v1;  
