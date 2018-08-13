@@ -46,10 +46,9 @@ extern int	avg_epp;
  * this version is a little messy, quick and sloppy:
  *
  *  - Each scanline has a linked list of edgepairs of all polygons that touch that scanline.
- *  - screen-space bounding rectangles for polygon span extents
+ *  - uses screen-space bounding rectangles for polygon span extents
  *  - no line to line (or pixel to pixel) coherence of edgepair lists
  *    (active edgepair list is rebuilt for each pixel)
- *
  *  - edgepair memory allocated when building the scanline bucket lists... free()'d
  *    when that edgepair is to the left of x in the scanline processing. 
  * 

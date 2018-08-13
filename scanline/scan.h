@@ -75,9 +75,6 @@ extern void	insert_edgepair(ep_t **eplist, ep_t *ep);
 extern void	process_edgepairs(int y, ep_t **eplist);
 extern void	print_edgepairs(ep_t *eplist);
 
-/* from geom.c */
-extern void	scan_obj_process(void);
-
 #endif
 /* __SCAN_H__ */
 

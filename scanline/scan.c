@@ -80,11 +80,6 @@ scan_scene(void)
 
     for (i=0; i<RPScene.yres; i++) {
 
-/*
-	fprintf(stderr,"bucket %d : ",i);
-	print_edgepairs(buckets[i]);
-*/
-
 	/* process edgepairs */
 
 	process_edgepairs(i, &(buckets[i]));
@@ -95,29 +90,31 @@ scan_scene(void)
         fprintf(stderr,"\b\b\b\b\b\b\b%5.2f %%",progress*100.0);
     }
 
-    for (i=0; i<RPScene.obj_count; i++) {
-        Object_t	*op;
-        Tri_t		*tp;
-        Vtx_t		*v0, *v1, *v2;
-        rgba_t		red = {255, 0, 0, 255};
-        int		j;
+	/* draw triangle outlines if desired: */
+    if ( Flagged(RPScene.generic_flags, FLAG_RENDER_02)) {
+        for (i=0; i<RPScene.obj_count; i++) {
+            Object_t	*op;
+            Tri_t	*tp;
+            Vtx_t	*v0, *v1, *v2;
+            rgba_t	red = {255, 0, 0, 255};
+            int		j;
 
-	op = RPScene.obj_list[i];
-	for (j=0; j<op->tri_count; j++) {
-	    tp = &(op->tris[j]);
+	    op = RPScene.obj_list[i];
+	    for (j=0; j<op->tri_count; j++) {
+	        tp = &(op->tris[j]);
+    
+	        v0  = &(op->verts[tp->v0]);
+	        v1  = &(op->verts[tp->v1]);
+	        v2  = &(op->verts[tp->v2]);
 
-	    v0  = &(op->verts[tp->v0]);
-	    v1  = &(op->verts[tp->v1]);
-	    v2  = &(op->verts[tp->v2]);
+	        if (!Flagged(tp->flags, FLAG_TRI_CLIPPED)) {
 
-	    if ( Flagged(RPScene.generic_flags, FLAG_RENDER_02) &&
-		!Flagged(tp->flags, FLAG_TRI_CLIPPED)) {
-
-	        RPDrawColorFBLine(v0->sx, v0->sy, v1->sx, v1->sy, red, TRUE);
-	        RPDrawColorFBLine(v1->sx, v1->sy, v2->sx, v2->sy, red, TRUE);
-	        RPDrawColorFBLine(v2->sx, v2->sy, v0->sx, v0->sy, red, TRUE);
-            }
-        }
+	            RPDrawColorFBLine(v0->sx, v0->sy, v1->sx, v1->sy, red, TRUE);
+	            RPDrawColorFBLine(v1->sx, v1->sy, v2->sx, v2->sy, red, TRUE);
+	            RPDrawColorFBLine(v2->sx, v2->sy, v0->sx, v0->sy, red, TRUE);
+                }
+            } /* for all polys for this object */
+        } /* for all objects */
     }
 
     RPCleanupObjects();
