@@ -36,7 +36,7 @@ for usage and command line options for the renderers that share `main.c`
 
 For **_Rendering Plant_** input format, see 
 [RP-INPUT-FORMAT.md](http://github.com/oldwatchlover/Rendering-Plant/blob/master/Documentation/RP-INPUT-FORMAT.md) 
-for a detaled description of the input file format.
+for a detailed description of the input file format.
 
 There are also some sample scenes in `./Scenes` and corresponding images of what those
 scenes shoud look like in `./Images`
