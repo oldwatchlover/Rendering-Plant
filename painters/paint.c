@@ -3,7 +3,7 @@
 /*
  * File:        paint.c
  *
- * The top of the painter's algorithm hardware algorithm simulator rasterizer
+ * The top of the painter's algorithm renderer
  *
  */
 
@@ -66,7 +66,7 @@ paint_scene(void)
     RPLoadBackgroundImage();
     RPSetSceneFlags(FLAG_PERSP_TEXTURE); /* tell pipeline to persp correct tex coords */
     RPProcessObjects(TRUE); 		/* tranform objects to camera space */
-					/* TRUE flag also does projection */
+					/* TRUE flag also computes projection data */
 
     if (Flagged(RPScene.flags, FLAG_FOG)) {
 	rgba_t	temp;
@@ -86,6 +86,8 @@ paint_scene(void)
         if (op->type == OBJ_TYPE_SPHERE) {
 
 		/* can't handle these yet */
+            fprintf(stderr,"%s : ERROR : %s : %d : can't handle objects of type SPHERE\n",
+                        program_name, __FILE__,__LINE__);
 
 	} else if (op->type == OBJ_TYPE_POLY) {
 
@@ -102,8 +104,8 @@ paint_scene(void)
 
 
     	} else {     /* can't happen */
-            fprintf(stderr,"ERROR : %s : %d : unknown object type %d\n",
-                        __FILE__,__LINE__,op->type);
+            fprintf(stderr,"%s : ERROR : %s : %d : unknown object type %d\n",
+                        program_name, __FILE__,__LINE__,op->type);
         }
 
         progress = (float)i/(float)RPScene.obj_count;

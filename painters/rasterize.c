@@ -62,11 +62,24 @@ pleq_dxdy(float inv_r, int ax, int ay, int bx, int by, float ac, float bc,
     *cy *= inv_r;
 }
 
+/*
+ * paint this triangle
+ *
+ * If usecfb == FALSE, then just update the depth buffer, not the
+ * color frame buffer. (this is used by the hidden line renderer)
+ *
+ */
 void
 paint_tri(Object_t *op, Tri_t *tri, int usecfb)
 {
     Vtx_t	*p0, *p1, *p2;
 
+	/*
+	 * if this triangle was clipped, then we don't want to draw it.
+	 * We know the clip process generated new triangles for the visible
+	 * portions, so drawing this one would be redundant (and potentially
+	 * mathematically error-prone)
+	 */
     if (Flagged(tri->flags, FLAG_TRI_CLIPPED))
 	return;
 
@@ -98,7 +111,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
     int		ydelh, ydelm, ydell, x, y;
     int		Hdx, Hdy, Mdx, Mdy;
     float	dhdy = 0.0, dmdy = 0.0, dldy = 0.0, xminor, xhigh, r, inv_r;
-    Colorf_t	colorsum, texcolor, polycolor, shadeval;
+    Colorf_t	colorsum, polycolor;
     Colorf_t	Hdcol, Mdcol, DxDcol, DyDcol, thiscolor;
     float	Hds, Mds, DxDs, DyDs, thiss;
     float	Hdt, Mdt, DxDt, DyDt, thist;
@@ -115,25 +128,25 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
     bcopy((void *) ip1, &point1, sizeof(Vtx_t)); p1 = &point1;
     bcopy((void *) ip2, &point2, sizeof(Vtx_t)); p2 = &point2;
 
-    /* edge deltas: */
+    	/* edge deltas: */
     Mdx = p1->sx - p0->sx;          Mdy = p1->sy - p0->sy;
     Hdx = p2->sx - p0->sx;          Hdy = p2->sy - p0->sy;
     
     r = Hdx*Mdy - Hdy*Mdx;	/* denom of plane equation */
  
-    /* reject degenerate triangles: */
+    	/* reject degenerate triangles: */
     if (NearlyZero(r, EpEpsilon)) {
 	RPScene.tiny_rejected_polys++;
 	return;
     }
 
-    /* cull backfacing: */
+    	/* cull backfacing: */
     if (Flagged(op->flags, FLAG_CULL_BACK) && r < 0.0) {
 	culled_polys++;
 	return;
     }
 
-    /* cull frontfacing: */
+    	/* cull frontfacing: */
     if (Flagged(op->flags, FLAG_CULL_FRONT) && r > 0.0) {
 	culled_polys++;
 	return;
@@ -167,7 +180,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
 	/* do nothing, rasterizer loop will interp vertex colors */
     }
 
-	/* fix texture coordinates, want to rasterize in perspected space: */
+	/* fix texture coordinates, we want to rasterize in perspected space: */
     if (Flagged(tri->flags, FLAG_TRI_CLIP_GEN)) {
 		/* texture coord already in s,t */
 	p0->s *= p0->inv_w;
@@ -187,7 +200,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
         }
     }
 
-    /* y-sort the 3 vertices of the triangle: */
+    	/* y-sort the 3 vertices of the triangle: */
     tmpp = &(tmp_buffer);
     if (p0->sy > p1->sy) {
 	tmpp = p0; p0 = p1; p1 = tmpp;
@@ -199,13 +212,13 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
 	tmpp = p1; p1 = p2; p2 = tmpp;
     }
 
-    /* edge deltas: */
+    	/* edge deltas: */
     Mdx = p1->sx - p0->sx;          Mdy = p1->sy - p0->sy;
     Hdx = p2->sx - p0->sx;          Hdy = p2->sy - p0->sy;
     r = Hdx*Mdy - Hdy*Mdx;
     inv_r = 1.0/r;
 
-    /* edge slopes: */
+    	/* edge slopes: */
     ydelh = p2->sy - p0->sy;
     ydelm = p1->sy - p0->sy;
     ydell = p2->sy - p1->sy;
@@ -214,7 +227,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
     if (ydelm != 0) dmdy = (float)(p1->sx - p0->sx)/(float) ydelm;
     if (ydell != 0) dldy = (float)(p2->sx - p1->sx)/(float) ydell;
 
-    		/* attribute deltas: */
+    	/* attribute deltas: */
     Hdcol.r = p2->r - p0->r;   		Mdcol.r = p1->r - p0->r;
     Hdcol.g = p2->g - p0->g;   		Mdcol.g = p1->g - p0->g;
     Hdcol.b = p2->b - p0->b;   		Mdcol.b = p1->b - p0->b;
@@ -236,7 +249,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
     Hdeye.y = p2->e.y - p0->e.y;  	Mdeye.y = p1->e.y - p0->e.y;
     Hdeye.z = p2->e.z - p0->e.z;  	Mdeye.z = p1->e.z - p0->e.z;
 
-    /* attribute slopes: */
+    	/* attribute slopes: */
     pleq_dxdy(inv_r, Hdx, Hdy, Mdx, Mdy, Hdcol.r, Mdcol.r, &DxDcol.r, &DyDcol.r);
     pleq_dxdy(inv_r, Hdx, Hdy, Mdx, Mdy, Hdcol.g, Mdcol.g, &DxDcol.g, &DyDcol.g);
     pleq_dxdy(inv_r, Hdx, Hdy, Mdx, Mdy, Hdcol.b, Mdcol.b, &DxDcol.b, &DyDcol.b);
@@ -267,20 +280,21 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
 	xminor = (float)p0->sx;
 
 
+	/* rasterize from ymin to ymax: */
     while (y <= p2->sy) {
 
 	x = (int)xhigh;
 
 	do { 		/* walk the x's */
 	    /* barycentric evaluation of vertex color, normal, and texcoord: */
-	    thiscolor.r = p0->r + (x - p0->sx)*DxDcol.r + (y - p0->sy)*DyDcol.r;
-	    thiscolor.g = p0->g + (x - p0->sx)*DxDcol.g + (y - p0->sy)*DyDcol.g;
-	    thiscolor.b = p0->b + (x - p0->sx)*DxDcol.b + (y - p0->sy)*DyDcol.b;
-	    thiscolor.a = p0->a + (x - p0->sx)*DxDcol.a + (y - p0->sy)*DyDcol.a;
-	    thiss       = p0->s + (x - p0->sx)*DxDs + (y - p0->sy)*DyDs;
-	    thist       = p0->t + (x - p0->sx)*DxDt + (y - p0->sy)*DyDt;
-	    thisw       = p0->inv_w + (x - p0->sx)*DxDw + (y - p0->sy)*DyDw;
-	    thisz       = p0->sz + (x - p0->sx)*DxDz + (y - p0->sy)*DyDz;
+	    thiscolor.r = p0->r     + (x - p0->sx)*DxDcol.r  + (y - p0->sy)*DyDcol.r;
+	    thiscolor.g = p0->g     + (x - p0->sx)*DxDcol.g  + (y - p0->sy)*DyDcol.g;
+	    thiscolor.b = p0->b     + (x - p0->sx)*DxDcol.b  + (y - p0->sy)*DyDcol.b;
+	    thiscolor.a = p0->a     + (x - p0->sx)*DxDcol.a  + (y - p0->sy)*DyDcol.a;
+	    thiss       = p0->s     + (x - p0->sx)*DxDs      + (y - p0->sy)*DyDs;
+	    thist       = p0->t     + (x - p0->sx)*DxDt      + (y - p0->sy)*DyDt;
+	    thisw       = p0->inv_w + (x - p0->sx)*DxDw      + (y - p0->sy)*DyDw;
+	    thisz       = p0->sz    + (x - p0->sx)*DxDz      + (y - p0->sy)*DyDz;
 	    thissurf.x  = p0->pos.x + (x - p0->sx)*DxDsurf.x + (y - p0->sy)*DyDsurf.x; 
 	    thissurf.y  = p0->pos.y + (x - p0->sx)*DxDsurf.y + (y - p0->sy)*DyDsurf.y; 
 	    thissurf.z  = p0->pos.z + (x - p0->sx)*DxDsurf.z + (y - p0->sy)*DyDsurf.z; 
@@ -322,6 +336,8 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
 	    }
 
 	    if (m->texture[MATERIAL_COLOR] != (Texture_t *) NULL) {
+		Colorf_t	texcolor;
+
 		if (Flagged(m->texture[MATERIAL_COLOR]->flags, FLAG_TXT_FILT)) {
 		    tex_samp = RPFilterSampleTexture(m->texture[MATERIAL_COLOR],
 						   thiss, thist, thisw,
@@ -351,6 +367,8 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
  	    }
 
 	    if (Flagged(op->flags, FLAG_LIGHTING)) {
+		Colorf_t	shadeval;
+
 		shade_pixel(op, tri, &thisn, &thissurf, &thiseye, &shadeval);
 
 		/* mult colorsum by shade values */
@@ -420,7 +438,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
 		x--;
 	    }
 
-	} while (TRUE);
+	} while (TRUE);		/* walk the x's */
 
 	if (y < p1->sy) {	/* swap minor edge slopes */
 	    xminor += dmdy;
@@ -430,7 +448,7 @@ bary_tri_setup(Object_t *op, Tri_t *tri, Vtx_t *ip0, Vtx_t *ip1, Vtx_t *ip2, int
 
 	xhigh += dhdy;
 	y++;
-    }
+    } 			/* rasterize from ymin to ymax: */
 
     /* optionally outline triangle, useful for debugging: */
     if (Flagged(RPScene.generic_flags, FLAG_RENDER_02) && usecfb) {

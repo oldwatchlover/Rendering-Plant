@@ -41,6 +41,7 @@
 #define MAX_ZVAL	REALLY_BIG_FLOAT
 
 	/* data types: */
+/* no renderer-specific data types are required... */
 
 	/* extern variables and functions: */
 extern int	culled_polys, drawn_polys;
