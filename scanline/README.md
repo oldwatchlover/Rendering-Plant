@@ -36,6 +36,9 @@ the scene for shadows, reflection, and refracted transparency.
 
 ### IMPLEMENTATION LIMITATIONS
 
+    - the background() input command is ignored. Since ray tracing happens in world space,
+      loading a background image is not trivial.
+
     - it is a polygonal renderer. Only triangles (or input that can be broken up
       into triangles). It is built with my librp.a framework, which will
       approximate spheres with polygonal data automatically.

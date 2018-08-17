@@ -37,6 +37,12 @@ Shaded Display,_ Comunications of the ACM, Vol. 23 Issue 6, June 1980.
 
 ### IMPLEMENTATION LIMITATIONS
 
+    - the background() input command is ignored. Since ray tracing happens in world space,
+      loading a background image is not trivial.
+
+    - there is no "clipping" in a ray tracing model. This includes hither/yon clipping.
+      Input commands that define clipping planes are ignored.
+
     - spheres are implemented as implicit geometry and their texture coordinates are generated with a straightforward spherical mapping.
 
     - only point light sources are currently supported.

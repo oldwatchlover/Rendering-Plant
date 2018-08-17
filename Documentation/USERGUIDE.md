@@ -54,13 +54,13 @@ The following options are available:
                 is printed while running. Useful for debugging.
 
 
-    -m <samp>   Number of samples per image pixel. Only the primary rays
-                (from the camera through the frame buffer) support multsampling;
-                <samp> * <samp> samples are cast for each primary ray and averaged
-                to determine the final frame buffer pixel value.
+    -m <samp>   Number of samples per image pixel. Only used by moray. Only the 
+                primary rays (from the camera through the frame buffer) support 
+                multsampling; <samp> * <samp> samples are cast for each primary 
+                ray and averaged to determine the final frame buffer pixel value.
 
 
-    -t          Toonshade. Only used by _draw_. Paints the image into the color
+    -t          Toonshade. Only used by draw. Paints the image into the color
                 buffer using provided colors/materials before drawing the line
                 image. With proper materials, this can create a nice "toon shading"
                 effect.

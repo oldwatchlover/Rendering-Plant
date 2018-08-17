@@ -93,6 +93,7 @@ an integer or floating point value - how those are specified can take many forms
         decimal integer   base 10, no decimal
         floating point    base 10, with a decimal. This data type supercedes integer,
                           so a floating point value such as 10 or 10.0 are equivalent.
+                          Scientific "e notation" is also accepted... -2.279973153091093e-14.
         text strings      text appearing in double quotes...`"like this"` 
 
 An integer is legal anywhere a float is required, however the opposite is not true.
@@ -666,14 +667,15 @@ The behavior of the `textureflags`, scaling, and offset is similar to OpenGL.
 
 #### Notes
 
+This command only loads the texture image into the scene data structure. You must set 
+object state and a material properly to actually use the texture.
+
 This command may be abbreviated:
 
 ```
 	tex("checker.bmp", WRAP, 1.0, 1.0, 0.0, 0.0);
 ```
 The program has a maximum of 32 textures.
-
-Only one texture per object.
 
 
 ___
@@ -1001,8 +1003,8 @@ more than 3 vertices, it will convert to triangles.
 
 #### Notes
 
-Only a subset of the full OBJ spec is supported. Material-related commands are
-consumed but ignored.
+Only a subset of the full OBJ spec is supported. `usemtl` is interpreted to assign
+per-polygon materials, but `mtllib` and smoothing groups are consumed but ignored.
 
 There is no support for paramentric curves or surfaces other than polygonal geometry.
 
