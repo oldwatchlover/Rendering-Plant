@@ -88,13 +88,14 @@ like this:
 an integer or floating point value - how those are specified can take many forms.
 
 
-        hexadecimal       beginning with 0x or 0X, followed by [0-F] or [0-f]
-        octal:            beginning with 0, followed by [0-7]
-        decimal integer   base 10, no decimal
-        floating point    base 10, with a decimal. This data type supercedes integer,
+        hexadecimal       Beginning with 0x or 0X, followed by [0-F] or [0-f]
+        octal:            Beginning with 0, followed by [0-7]
+        decimal integer   Base 10, no decimal
+        floating point    Base 10, with a decimal. This data type supercedes integer,
                           so a floating point value such as 10 or 10.0 are equivalent.
                           Scientific "e notation" is also accepted... -2.279973153091093e-14.
-        text strings      text appearing in double quotes...`"like this"` 
+        text strings      Text appearing in quotes... "like this" 
+                          Either single quotes or double quotes are accepted (they must match).
 
 An integer is legal anywhere a float is required, however the opposite is not true.
 
@@ -368,7 +369,7 @@ Specify linear fog parameters for the scene
         start           positive floating point, distance from the eye
         end             positive floating point, distance from the eye
                         (should be larger than start)
-        r, g, b	    floating point color (R,G,B), range 0.0-1.0
+        r, g, b, a      floating point color (R,G,B,A), range 0.0-1.0
 
 #### Description
 
@@ -471,8 +472,8 @@ Creates a local light and adds it to the scene.
 
 #### Notes
 
-This API currently only supports a simple local light (lights in all direction, no
-attenuation, etc.). Spot lights and other light sources should be added TBD.
+This API currently only supports a simple local point light source (lights in all direction, no
+attenuation, etc.). Spot lights, area lights, and other light sources should be added TBD.
 
 ___
 
@@ -604,7 +605,7 @@ is one of `color`, `ambient`, `diffuse`, `specular`, `highlight`. This selects w
 color channel to map the texture into during shading (similar to Wavefront materials). 
 Currently this is not implemented in the shaders, only in the input stream.
 
-Material name requires a little explanation... most objects have a single material,
+Material _name_ requires a little explanation... most objects have a single material,
 and in that case usage of `material(name, ...` is optional (but a good idea)
 If there is only one material, any calls to set material parameters modify the 
 single current material and when an object is created, that material is "bound" 
