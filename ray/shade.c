@@ -17,9 +17,6 @@
  * Since the image is stored in 24 bit pixels, colors are converted to 0-255 right
  * before we return.
  *
- * In this version, only triangles can be textured... (someone should write 
- * more code)
- *
  * Most raytrace algorithms use an "offset bias" for secondary rays (shadow, 
  * reflected, refracted rays) so they ray starts just a bit off of the 
  * originating surface to avoid "self-intersetions" due to math precision 
