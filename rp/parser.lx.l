@@ -653,6 +653,13 @@ extern int  _RPmylineno;
                             yylval.string[yyleng-2] = (char) NULL;
                             RET(QSTRING);
                         }
+\'[^\']*[\']            {   /* quoted string */
+                            strcat(_RPline_buffer, yytext);
+                            yylval.string = (char *) malloc(strlen(yytext)+1);
+                            strcpy(yylval.string, yytext+1);
+                            yylval.string[yyleng-2] = (char) NULL;
+                            RET(QSTRING);
+                        }
 [ \t]*			{
                             strcat(_RPline_buffer, yytext);
 			    /* skip white space including commas */
