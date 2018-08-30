@@ -80,7 +80,7 @@ The biggest lesson I've learned in all of these projects I've taken with me to a
 engineering and software development I've worked on. It's best phrased as a question:
 
 	"If you are developing software, what would you differently if running the
-	compiler cost a million dollars and you had to wait 4 weeks for your output?"
+	compiler once cost a million dollars and you had to wait 4 weeks for your output?"
 
 You'd simulate. And test. And simulate some more. And verify your designs. You'd do
 anything you could so that when you got the results back from your "compiler" you would
