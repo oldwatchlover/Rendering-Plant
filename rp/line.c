@@ -46,6 +46,103 @@
 #   define Clamp1(a)	((a) < 1.0 ? (a) : 1.0)
 #endif
 
+
+
+/*
+ * Wu's anti-aliased line algorithm.
+ *
+ * Coded from the wikipedia entry
+ *
+ */
+void
+wuline(int x0, int y0, int x1, int y1, PixelPlotProc PlotPixel)
+{
+    int		steep, xpix1, xpix2, ypix1, ypix2, x;
+    float	dx, dy, xend, yend, xgap, gradient, intery;
+
+#define wuPlot(x, y, c)	(*PlotPixel)((int)(x), (int)(y), (int)((c)*255));
+#define Round(x)	((int) ((float)(x)+0.5)) 
+#define iPart(x)	((int)(x))
+#define fPart(x)	((float)(x) - (float)iPart((x)))
+#define rfPart(x)	(1.0 - fPart((x)))
+#define Swap(a, b)	do { __typeof__(a) tmp = b; b = a; a = tmp; } while (0);
+
+    if (Abs(y1 - y0) > Abs(x1 - x0)) {
+        steep = 1;
+    } else {
+        steep = 0;
+    }
+
+    if (steep) {
+	Swap(x0, y0);
+	Swap(x1, y1);
+    }
+
+    if (x0 > x1) {
+	Swap(x0, x1);
+	Swap(y0, y1);
+    }
+
+    dx = x1 - x0;
+    dy = y1 - y0;
+
+    if (dx == 0.0) { 
+ 	gradient = 1.0;
+    } else {
+        gradient = dy / dx;
+    }
+
+	/* handle first endpoint: */
+    xend = Round(x0);
+    yend = y0 + gradient * (xend - x0);
+    xgap = rfPart(x0 + 0.5);
+    xpix1 = xend;
+    ypix1 = iPart(yend);
+
+    if (steep) {
+	wuPlot(ypix1, xpix1,   rfPart(yend) * xgap);
+	wuPlot(ypix1+1, xpix1, fPart(yend) * xgap);
+    } else {
+	wuPlot(xpix1, ypix1,   rfPart(yend) * xgap);
+	wuPlot(xpix1, ypix1+1, fPart(yend) * xgap);
+    }
+    intery = yend + gradient;
+
+	/* handle second endpoint: */
+    xend = Round(x1);
+    yend = y1 + gradient * (xend - x1);
+    xgap = rfPart(x1 + 0.5);
+    xpix2 = xend;
+    ypix2 = iPart(yend);
+
+    if (steep) {
+	wuPlot(ypix2, xpix2,   rfPart(yend) * xgap);
+	wuPlot(ypix2+1, xpix2, fPart(yend) * xgap);
+    } else {
+	wuPlot(xpix2, ypix2,   rfPart(yend) * xgap);
+	wuPlot(xpix2, ypix2+1, fPart(yend) * xgap);
+    }
+
+ 	/* main loop */   
+
+    if (steep) {
+	for (x = xpix1+1; x<xpix2; x++) {
+	    wuPlot(iPart(intery), x, rfPart(intery));
+	    wuPlot(iPart(intery)+1, x, fPart(intery));
+	    intery = intery + gradient;
+ 	}
+    } else {
+	for (x = xpix1+1; x<xpix2; x++) {
+	    wuPlot(x, iPart(intery), rfPart(intery));
+	    wuPlot(x, iPart(intery)+1, fPart(intery));
+	    intery = intery + gradient;
+ 	}
+    }
+
+}
+
+
+
 /*
  * bresline()
  *

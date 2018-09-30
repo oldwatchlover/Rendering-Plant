@@ -37,6 +37,7 @@
 
 typedef void (*PixelPlotProc) (int x, int y, int color);
 
+extern void	wuline(int x1, int y1, int x2, int y2, PixelPlotProc PlotPixel);
 extern void	bresline(int x1, int y1, int x2, int y2, PixelPlotProc PlotPixel);
 extern void	abresline(int x1, int y1, int x2, int y2, PixelPlotProc PlotPixel);
 extern void	brescircle(int xcenter, int ycenter, int radius, 
