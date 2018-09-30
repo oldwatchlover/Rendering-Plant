@@ -42,7 +42,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <locale.h>
 #include <errno.h>
 #include <time.h>
 
@@ -84,7 +83,6 @@ main(int argc, char *argv[])
     char		cppdefs[256], usage_string[256];
 
     setprogname(argv[0]);	/* stdlib... we'll want this later */
-    setlocale(LC_ALL,"");	/* for prettier printing */
 
     strcpy(cppdefs, "");
     sprintf(usage_string,"usage : %s %s", argv[0], USAGE_STRING);
