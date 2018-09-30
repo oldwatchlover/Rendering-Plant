@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include "rp.h"
 
@@ -43,6 +44,8 @@ static int	program_flags;
 void
 RPInit(char *pname, u32 flags)
 {
+    setlocale(LC_ALL,"");       /* for prettier printing */
+
     if (pname == (char *) NULL) {
 	program_name = (char *) calloc(MAX_FILENAME_LENGTH+1, sizeof(char));
 	strncpy(program_name, getprogname(), MAX_FILENAME_LENGTH);
