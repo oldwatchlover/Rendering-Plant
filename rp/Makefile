@@ -31,6 +31,12 @@ CPPFLAGS +=	-I/usr/local/opt/flex/include -I/usr/local/opt/gettext/include
 
 CFLAGS +=	-I../include
 
+# more info while processing matrices...
+#CFLAGS +=      -DDEBUG_MATRIX
+# more info while processing BMP files...
+#CFLAGS +=      -DDEBUG_BMP
+
+
 # yacc flags:
 YFLAGS = -v -d -t
 

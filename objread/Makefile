@@ -30,6 +30,9 @@ CPPFLAGS +=	-I/usr/local/opt/flex/include -I/usr/local/opt/gettext/include
 
 CFLAGS +=	-I../include
 
+# more info while processing .obj files...
+#CFLAGS +=      -DDEBUG_LIBOBJ
+
 # yacc flags:
 YFLAGS = -v -d -t
 # lex flags:
