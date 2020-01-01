@@ -54,12 +54,12 @@
 #endif
 #ifdef DRAW
 #   include "hidden.h"
-#   define PROGRAM_VERSION	"0.5"
+#   define PROGRAM_VERSION	"1.0"
 #   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-t] [-v] [-y] scenefile"
 #endif
 #ifdef SCAN
 #   include "scan.h"
-#   define PROGRAM_VERSION	"0.8"
+#   define PROGRAM_VERSION	"1.0"
 #   define USAGE_STRING "[-D ...] [-I ...] [-b] [-d[d]] [-v] [-y] scenefile"
 #endif
 #ifdef PAINT

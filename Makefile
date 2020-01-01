@@ -87,6 +87,9 @@ clean:
 	rm -f paint $(PAINT_OBJS)
 	rm -f scan $(SCAN_OBJS)
 
+clobber:	clean
+	rm -f *.bmp
+
 moray.o:	main.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
